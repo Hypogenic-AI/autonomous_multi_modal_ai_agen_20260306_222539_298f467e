@@ -1,0 +1,27 @@
+{
+  "success": true,
+  "stages": {
+    "resource_finder": {
+      "success": true,
+      "completion_marker": "/workspaces/autonomous_multi_modal_ai_agen_20260306_222539_298f467e/.resource_finder_complete",
+      "outputs": {
+        "literature_review": "/workspaces/autonomous_multi_modal_ai_agen_20260306_222539_298f467e/literature_review.md",
+        "resources_catalog": "/workspaces/autonomous_multi_modal_ai_agen_20260306_222539_298f467e/resources.md",
+        "papers_dir": "/workspaces/autonomous_multi_modal_ai_agen_20260306_222539_298f467e/papers",
+        "datasets_dir": "/workspaces/autonomous_multi_modal_ai_agen_20260306_222539_298f467e/datasets",
+        "code_dir": "/workspaces/autonomous_multi_modal_ai_agen_20260306_222539_298f467e/code"
+      },
+      "log_file": "/workspaces/autonomous_multi_modal_ai_agen_20260306_222539_298f467e/logs/resource_finder_claude.log",
+      "transcript_file": "/workspaces/autonomous_multi_modal_ai_agen_20260306_222539_298f467e/logs/resource_finder_claude_transcript.jsonl",
+      "elapsed_time": 1195.8429563045502
+    },
+    "experiment_runner": {
+      "success": true,
+      "return_code": 0,
+      "elapsed_time": 1091.7336049079895,
+      "log_file": "/workspaces/autonomous_multi_modal_ai_agen_20260306_222539_298f467e/logs/execution_claude.log",
+      "transcript_file": "/workspaces/autonomous_multi_modal_ai_agen_20260306_222539_298f467e/logs/execution_claude_transcript.jsonl"
+    }
+  },
+  "work_dir": "/workspaces/autonomous_multi_modal_ai_agen_20260306_222539_298f467e"
+}

@@ -1,0 +1,916 @@
+You are an academic paper writer. Generate a complete NEURIPS style paper
+based on the experiment results provided.
+
+════════════════════════════════════════════════════════════════════════════════
+                         IMPORTANT: BEFORE YOU START
+════════════════════════════════════════════════════════════════════════════════
+
+Before writing any content, you MUST complete these steps:
+
+1. READ THE SKILL: Review the paper-writer skill at .claude/skills/paper-writer/SKILL.md
+2. READ THE STYLE GUIDE: Study templates/paper_writing/lab_style_guide.md carefully
+3. REVIEW EXAMPLES: Browse paper_examples/ for formatting and language patterns:
+   - Look at sections/1.introduction.tex for language style
+   - Look at tables/*.tex for table formatting
+   - Look at commands/*.tex for macro usage
+4. VERIFY COMMAND TEMPLATES: Command templates (math.tex, general.tex, macros.tex) are pre-copied to paper_draft/commands/
+
+CRITICAL: Reference example papers for FORMATTING and LANGUAGE STYLE only.
+Do NOT copy content, phrasing, or narrative structure from the example papers.
+The examples are in a different research domain - focus only on presentation style.
+
+════════════════════════════════════════════════════════════════════════════════
+                            EXPERIMENT REPORT
+════════════════════════════════════════════════════════════════════════════════
+
+# Research Report: Autonomous Multi-Modal AI Agent for Wet-Lab Experiment Design and Execution
+
+**Date**: March 6, 2026
+**Model**: Claude claude-sonnet-4-6 (claude-sonnet-4-6)
+**Dataset**: BioProBench Error Correction Task (n=10 samples)
+
+---
+
+## 1. Executive Summary
+
+This study evaluates a modular AI agent (WetLabAgent) that autonomously detects and corrects errors in biological laboratory protocols, simulating a core capability of adaptive wet-lab automation systems. Using real API calls to Claude claude-sonnet-4-6, we tested four experimental conditions: vanilla LLM (single-shot), tool-augmented LLM, and multi-round feedback loop agents (1 and 3 rounds). Results show that all agents achieve high error **detection** accuracy (80-90%) but modest exact-match **correction** accuracy (20-30%) due to a critical failure mode: the LLM over-corrects protocols by fixing the primary error while also reformatting irrelevant text. Crucially, **semantic accuracy** — measuring whether the primary error was correctly identified and fixed — reaches 70-80% across conditions, with the 3-round feedback loop achieving the highest semantic accuracy (80%). Statistical comparison reveals a medium effect size (Cohen&#39;s h = 0.23) favoring the feedback loop over vanilla LLM, though differences are not statistically significant at n=10 (McNemar p = 1.0), a key limitation.
+
+---
+
+## 2. Goal
+
+**Hypothesis**: A multi-modal AI agent integrating literature comprehension, hypothesis generation, and robotic control can autonomously design and execute simple wet-lab experiments with comparable accuracy to human-designed protocols. The agent will demonstrate improved experimental efficiency through real-time feedback adaptation compared to static pre-programmed protocols.
+
+**Problem addressed**: Current laboratory automation systems execute fixed, pre-programmed protocols. When unexpected results occur (wrong pH, contaminated reagents, instrument variation), human intervention is required. An AI agent that can interpret results in real-time and dynamically adjust protocols would eliminate this bottleneck.
+
+**Expected impact**: Accelerated scientific discovery in drug development, enzyme engineering, and synthetic biology by enabling continuous, autonomous experimental adaptation without human checkpoints.
+
+---
+
+## 3. Data Construction
+
+### Dataset Description
+- **Source**: BioProBench (GreatCaptainNemo/BioProBench on HuggingFace)
+- **Task**: Error Correction — identify if a biological protocol step contains an error; if so, provide the corrected version
+- **Full dataset**: 27,000 protocols, 556,000 structured instances; **Samples used**: 10 (local sample set)
+- **Ground truth**: Expert-corrected biological laboratory protocols
+- **Known limitation**: Small sample size (n=10) limits statistical power
+
+### Example Samples
+
+**Sample 1** (Type: parameter — wrong CO2 concentration):
+```
+Corrupted:  &#34;Maintain hESCs in Nutristem medium ... in a humidified incubator (37°C, 10% CO2).&#34;
+Corrected:  &#34;Maintain hESCs in Nutristem medium ... in a humidified incubator (37°C, 5% CO2).&#34;
+Error type: CO2 concentration is critical for maintaining pH balance (standard: 5%)
+```
+
+**Sample 2** (Type: reagent — wrong dilution factor):
+```
+Corrupted:  &#34;...with 1:100 ROCK inhibitor.&#34;
+Corrected:  &#34;...with 1:1000 ROCK inhibitor.&#34;
+Error type: ROCK inhibitor dilution crucial for preventing apoptosis during cell dissociation
+```
+
+**Sample 3** (Type: correct — no error present):
+```
+Protocol:   &#34;Pre-warm EDTA and E6 to room temperature.&#34;
+Expected:   LLM detects no error (has_error=False)
+```
+
+### Data Quality
+- 6/10 samples contain deliberate protocol errors (type: parameter, reagent, operation)
+- 4/10 samples are correct protocols (type: correct, is_correct=True)
+- For correct samples: `corrupted_text=None`, text is provided via `corrected_text` field
+- Error types distribution: parameter (2), reagent (2), operation (2), correct (4)
+- No missing values in used fields
+
+### Preprocessing Steps
+1. Load JSON from `datasets/bioprobench/samples.json`
+2. For corrupted samples: use `corrupted_text` as LLM input
+3. For correct samples: use `corrected_text` as LLM input (LLM should detect no error)
+4. Ground truth: `corrected_text` for all samples; `is_correct` flag for detection label
+5. Two evaluation modes: exact string match and semantic match (primary error corrected)
+
+---
+
+## 4. Experiment Description
+
+### Methodology
+
+#### High-Level Approach
+We implemented a **WetLabAgent** system with 4 progressively more sophisticated experimental conditions, evaluated on BioProBench error correction tasks using real Claude claude-sonnet-4-6 API calls:
+
+1. **Vanilla LLM** (Baseline): Single-shot prompt with no tools or feedback
+2. **Tool-Augmented LLM**: Domain-specific tools run first; outputs fed to LLM context
+3. **Feedback Loop (1 round)**: Tool augmentation + one round of simulated lab observation feedback
+4. **Feedback Loop (3 rounds)**: Tool augmentation + three rounds of simulated closed-loop adaptation
+
+The key innovation is the **real-time feedback adaptation loop** in conditions 3 and 4, which simulates the closed-loop system that would occur in a physical wet-lab: the agent generates a protocol correction, a simulated robotic executor &#34;runs&#34; it, observes the outcome (pass/fail + anomaly type), and the agent uses this observation to refine its correction.
+
+#### Why This Method?
+- **BioProBench** selected because it provides ground-truth protocol corrections with expert-verified answers, enabling objective evaluation
+- **Error Correction task** directly tests the core capability: detecting and fixing protocol errors in real-time, which is the key bottleneck in adaptive wet-lab automation
+- **Claude claude-sonnet-4-6** selected as the strongest available production LLM backbone (as of 2026) with proven scientific reasoning capabilities
+
+### Implementation Details
+
+#### Tools and Libraries
+| Library | Version | Purpose |
+|---------|---------|---------|
+| anthropic | 0.84.0 | LLM API client |
+| numpy | 2.4.2 | Numerical analysis |
+| scipy | 1.17.1 | Statistical tests |
+| matplotlib | 3.10.8 | Visualization |
+| pandas | N/A (JSON used) | Data handling |
+
+#### Domain Tools
+Two domain-specific validation tools were implemented:
+
+1. **`tool_validate_parameters(text)`**: Uses regex to extract numerical values and compares against biological parameter ranges (CO2: 4-6%, incubator temperature: 35-39°C, ROCK inhibitor dilution: 1:500-1:2000). Flags anomalies.
+
+2. **`tool_check_protocol_structure(text, context)`**: Checks structural consistency between protocol text and adjacent steps (purpose, prior step, next step). Flags inconsistencies.
+
+#### Hyperparameters
+| Parameter | Value | Rationale |
+|-----------|-------|-----------|
+| Model | claude-sonnet-4-6 | Latest production LLM, best reasoning |
+| Temperature | 0.0 | Deterministic for reproducibility |
+| Max tokens | 512 | Sufficient for protocol corrections |
+| Random seed | 42 | Reproducibility |
+| Feedback rounds | 1, 3 | Trade-off between performance and latency |
+
+#### Training Procedure
+No training; inference-only evaluation. Each condition evaluated on all 10 samples.
+
+### Experimental Protocol
+
+#### Reproducibility Information
+- Number of runs: 1 (deterministic, temperature=0.0)
+- Random seeds: 42 for all numpy/random operations
+- Hardware: CPU only (no GPU), Linux kernel 6.12.72
+- Total API calls: 50 (10 samples × [1+1+1+3] conditions = 60, minus early exits = 50)
+- Total experiment time: ~5 minutes wall clock
+
+#### Evaluation Metrics
+
+1. **Error Detection Accuracy** (binary): Does the LLM correctly identify whether a protocol contains an error? (True Positive: LLM says error exists and it does; True Negative: LLM says no error and there is none)
+
+2. **Exact Correction Accuracy** (binary): Does the LLM&#39;s corrected text exactly match the ground truth corrected text (after normalization)?
+
+3. **Semantic Correction Accuracy** (binary): Does the LLM&#39;s output contain the correct primary fix (e.g., &#34;5% CO2&#34; when the error was &#34;10% CO2&#34;), even if other parts of the text were unnecessarily modified?
+
+4. **Latency** (seconds): Average API call time per sample per condition.
+
+5. **API Call Count**: Average number of LLM calls per sample (efficiency metric).
+
+### Raw Results
+
+#### Metrics Table
+
+| Condition | Detection Acc | Exact Correction | Semantic Acc | Avg Latency (s) | API Calls |
+|-----------|:------------:|:---------------:|:------------:|:---------------:|:---------:|
+| Vanilla LLM (no tools) | **90%** | 20% | 70% | 4.62 | 1.0 |
+| Tool-Augmented LLM | 80% | **30%** | 70% | 3.89 | 1.0 |
+| Feedback Loop (1 round) | 80% | **30%** | 70% | 4.04 | 1.0 |
+| Feedback Loop (3 rounds) | **90%** | **30%** | **80%** | 13.69 | 2.4 |
+
+*Note: Feedback loop (3 rounds) averages 2.4 API calls due to early exit when correct answer reached.*
+
+#### Per-Error-Type Breakdown (Semantic Accuracy, Vanilla LLM vs Feedback 3-round)
+
+| Error Type | n | Vanilla Semantic | Feedback-3 Semantic |
+|-----------|---|:-:|:-:|
+| parameter | 2 | 100% | 100% |
+| reagent | 2 | 100% | 100% |
+| operation | 2 | 50% | 50% |
+| correct | 4 | 50% | 75% |
+
+Key finding: Operation errors are hardest (50% semantic accuracy); the LLM suggests plausible-but-wrong parameter values (e.g., centrifuge at 400× g when correct is 800× g).
+
+#### Output Locations
+- Raw results: `results/raw_results.json` (40 entries)
+- Computed metrics: `results/metrics.json`
+- Semantic metrics: `results/semantic_metrics.json`
+- Plots: `results/plots/`
+
+---
+
+## 5. Result Analysis
+
+### Key Findings
+
+1. **High detection, low exact correction**: All agents achieve 80-90% error detection accuracy but only 20-30% exact correction accuracy. The gap reveals that detection (binary) is much easier than producing exact protocol text.
+
+2. **Over-correction is the dominant failure mode**: The LLM correctly identifies the primary error in 70-80% of cases but also modifies surrounding text (normalizing units, reformatting notation, standardizing abbreviations) that the ground truth doesn&#39;t change. This causes exact match failure even when the scientific fix is correct.
+
+   Example: Ground truth fixes `10%C0_2` → `5%C0_2`. LLM fixes both the CO2 percentage AND reformats `0.5u/c m^2` → `0.5ug/cm^2`, causing exact match failure.
+
+3. **Feedback loop achieves highest semantic accuracy (80%)**: The 3-round feedback loop reaches 80% semantic accuracy vs 70% for vanilla LLM, demonstrating that iterative adaptation does help, particularly for &#34;correct&#34; protocol samples (75% vs 50%).
+
+4. **Tool augmentation helps for &#34;correct&#34; samples**: The tool-augmented LLM correctly handles the `correct` protocol type better than vanilla LLM in specific cases (e.g., sample TEST-ERR-000004: tool-augmented succeeds, vanilla fails).
+
+5. **Operation errors are hardest**: Centrifuge speed errors (parameter value changes without clear domain context) are the most difficult: the LLM proposes plausible but wrong values (400× g instead of 800× g).
+
+### Hypothesis Testing Results
+
+**H1**: LLM achieves &gt;70% accuracy on protocol quality — **SUPPORTED at semantic level** (70-80% semantic), **NOT SUPPORTED at exact match level** (20-30% exact).
+
+**H2**: Multi-round feedback improves accuracy over single-shot — **PARTIALLY SUPPORTED**: Semantic accuracy 80% (3 rounds) vs 70% (vanilla). McNemar test: p=1.0 (not significant, n=10 too small). Effect size: Cohen&#39;s h = 0.23 (medium).
+
+**H3**: Tool-augmented LLM outperforms vanilla LLM — **MIXED**: Tool augmentation improves exact match (30% vs 20%) and helps with correct-sample detection, but McNemar p=1.0 (not significant).
+
+**H4**: Error detection F1 &gt; 0.7 — **SUPPORTED**: 80-90% detection accuracy; F1 ≈ 0.87 for vanilla LLM (all 6 corrupted detected correctly; 3/4 correct samples identified correctly).
+
+**Statistical note**: With n=10 and binary outcomes, McNemar&#39;s test has very low statistical power. The observed differences are numerically meaningful but cannot be declared statistically significant.
+
+### Comparison to Baselines
+
+The BioProBench paper (2025) reports performance of 12 LLMs on the error correction task. Our results are in line with the reported performance range for state-of-the-art LLMs:
+- Most capable LLMs in the paper achieve 60-80% accuracy on the error correction subtask
+- Our semantic accuracy (70-80%) is consistent with this range
+- Our exact match accuracy (20-30%) is lower, reflecting the strict matching criterion and the LLM&#39;s tendency to over-correct
+
+### Surprises and Insights
+
+1. **Over-correction is an underreported failure mode**: The LLM&#39;s tendency to &#34;improve&#34; correct parts of protocols while fixing errors is not typically analyzed in existing benchmarks. This has implications for wet-lab deployment: an agent that makes unnecessary changes could introduce new errors.
+
+2. **Detection-correction gap**: The large gap between detection accuracy (90%) and correction accuracy (20-30% exact) suggests that biological protocol correction is qualitatively harder than detection — the LLM knows *that* something is wrong but struggles to make only the minimal required fix.
+
+3. **Feedback loop helps most for ambiguous cases**: The 3-round feedback loop particularly helps with &#34;correct&#34; protocol samples, suggesting that the simulated execution feedback helps the agent realize when no change is needed.
+
+4. **Tool outputs add noise for simple protocols**: For very simple protocol steps (e.g., &#34;Pre-warm EDTA and E6 to room temperature&#34;), domain tools find no issues, which paradoxically may help the LLM correctly output has_error=False.
+
+### Error Analysis
+
+**Systematic failure: Operation type errors**
+- TEST-ERR-000002: Corrupted &#34;2000 rpm&#34; → LLM outputs &#34;200× g (approx 1000 rpm)&#34; instead of &#34;1000 rpm&#34;. The LLM correctly identifies the magnitude order but uses different units.
+- TEST-ERR-000006: Corrupted &#34;1600× g&#34; → LLM suggests &#34;400× g&#34; instead of &#34;800× g&#34;. The LLM knows the value is too high but guesses the wrong correction.
+
+**Systematic failure: Text normalization over-correction**
+All 6 corrupted samples exhibit this: LLM fixes the primary error but also reformats notation. Examples:
+- `0.5u/c m^2` → `0.5ug/cm^2` (unit format standardization)
+- `RPMI 1460` → `RPMI 1640` (reagent name correction — actually a secondary error fix!)
+- `3 mL per 3 cm well` → `3 mL per well` (simplification)
+
+### Limitations
+
+1. **Small sample size (n=10)**: All statistical tests are underpowered. Differences are numerically meaningful but not statistically significant. Full BioProBench dataset evaluation needed.
+
+2. **Simulated lab feedback**: The feedback mechanism uses rule-based simulated observations, not real robotic sensor data. The feedback quality is limited by the simulation&#39;s ability to detect errors.
+
+3. **Exact match evaluation too strict**: The BioProBench exact match metric penalizes scientifically correct fixes that also change formatting. Semantic accuracy better captures real protocol quality but requires manual heuristics.
+
+4. **Single model**: Only Claude claude-sonnet-4-6 evaluated. Comparative evaluation across model families (GPT-5, Gemini 2.5 Pro) would strengthen conclusions.
+
+5. **Single-step evaluation**: BioProBench provides isolated protocol steps; real experiments involve multi-step protocols where early-step errors propagate.
+
+6. **No physical execution**: Results are fully computational. Physical wet-lab validation is required for deployment claims.
+
+---
+
+## 6. Conclusions
+
+### Summary
+WetLabAgent demonstrates that a Claude claude-sonnet-4-6-based agent can accurately detect protocol errors (80-90% detection accuracy) in biological wet-lab protocols, and can semantically correct primary errors in 70-80% of cases. However, the agent systematically over-corrects protocols — fixing the primary error while also modifying text that should remain unchanged — reducing exact-match accuracy to 20-30%. The 3-round feedback loop achieves the highest semantic accuracy (80%), demonstrating that iterative closed-loop adaptation provides measurable benefit over single-shot generation.
+
+### Implications
+- **For wet-lab automation**: AI agents should be evaluated on semantic rather than exact-match metrics; over-correction is a safety risk that requires targeted mitigation.
+- **For system design**: A &#34;minimal-change&#34; constraint in the agent prompt (or as a post-processing step) could dramatically improve exact-match performance without sacrificing semantic correctness.
+- **For the field**: Detection capability far exceeds correction capability; AI agents are better suited as &#34;error flaggers&#34; with human verification than as autonomous protocol correctors in high-stakes settings.
+
+### Confidence in Findings
+Moderate confidence given n=10. The qualitative patterns (over-correction, detection-correction gap, operation error difficulty) are consistent and interpretable. Numerical results should be replicated on the full BioProBench dataset (27K protocols) to establish statistical significance.
+
+---
+
+## 7. Next Steps
+
+### Immediate Follow-ups
+1. **Full BioProBench evaluation** (n=27K): Test on complete dataset to achieve statistical significance; compute F1, BLEU, and BioProBench-native metrics for fair comparison with 12 published LLM baselines.
+
+2. **Minimal-change prompt engineering**: Add explicit instruction &#34;make only the minimum necessary change, do not reformat or standardize other parts of the text.&#34; Hypothesis: this could boost exact match from 30% → 60%+.
+
+3. **Multi-model comparison**: Run identical experiments with GPT-5, Gemini 2.5 Pro, and a fine-tuned biology model to assess whether the over-correction pattern is model-specific.
+
+### Alternative Approaches
+- **Fine-tuning on BioProBench training set**: Domain-adapted model may avoid over-correction
+- **Constrained decoding**: Post-process LLM output to preserve all tokens that don&#39;t need changing
+- **Constitutional AI approach**: Add a self-critique step where LLM checks if it changed more than necessary
+
+### Broader Extensions
+- Extend to multi-step protocol evaluation (currently single-step)
+- Integrate with real robotic system API for physical execution validation
+- Develop a multi-modal version processing protocol images (plate photos, gel images) as additional context
+- Build a BioProBench leaderboard entry with full dataset evaluation
+
+### Open Questions
+1. Does the over-correction failure mode persist with fine-tuned models, or is it a general-purpose LLM phenomenon?
+2. Can few-shot examples of &#34;minimal change&#34; corrections train out the over-correction behavior?
+3. How does performance scale with protocol complexity (number of steps, reagent count)?
+4. What is the false-negative rate for subtle errors (e.g., wrong incubation time) vs. obvious errors (wrong CO2 concentration)?
+
+---
+
+## References
+
+1. Bran, A.M. et al. (2023). ChemCrow: Augmenting Large Language Models with Chemistry Tools. arXiv:2304.05376.
+2. Schmidgall, S. et al. (2025). Agent Laboratory: Using LLM Agents as Research Assistants. arXiv:2501.04227.
+3. Gridach, M. et al. (2025). Agentic AI for Scientific Discovery. arXiv:2503.08979.
+4. Qin, X. et al. (2023). GPT-Lab: Next Generation of Optimal Chemistry Discovery. arXiv:2309.16721.
+5. Cooper, A.I. et al. (2025). Accelerating Discovery in Natural Science Laboratories. arXiv:2501.06847.
+6. Zhou, L. et al. (2025). Autonomous Agents for Scientific Discovery. arXiv:2510.09901.
+7. Zhang, P. et al. (2025). Scaling Laws in Scientific Discovery with AI and Robot Scientists. arXiv:2503.22444.
+8. BioProBench Dataset. HuggingFace: GreatCaptainNemo/BioProBench. 2025.
+9. Anthropic. (2026). Claude claude-sonnet-4-6 (claude-sonnet-4-6). API documentation.
+
+
+════════════════════════════════════════════════════════════════════════════════
+                            RESEARCH PLAN
+════════════════════════════════════════════════════════════════════════════════
+
+# Research Planning: Autonomous Multi-Modal AI Agent for Wet-Lab Experiment Design
+
+## Motivation &amp; Novelty Assessment
+
+### Why This Research Matters
+Laboratory automation currently relies on rigid, pre-programmed protocols that cannot adapt to unexpected experimental results or novel conditions. A system that integrates AI-driven literature comprehension, dynamic hypothesis generation, and real-time feedback adaptation could dramatically accelerate scientific discovery by reducing the human bottleneck in iterative experimental workflows. This directly impacts fields like drug discovery, enzyme engineering, and synthetic biology where experiment-feedback cycles take days to weeks.
+
+### Gap in Existing Work
+Based on `literature_review.md`:
+1. **No real-time feedback adaptation in wet-lab settings**: Current systems (GPT-Lab, Coscientist) either use rigid robotic protocols or operate in silico only.
+2. **Biology wet-lab underrepresented**: Most autonomous experiment systems focus on chemistry; biology wet-lab automation (cell culture, assays) is less developed.
+3. **No standardized benchmark for end-to-end autonomous wet-lab execution**: BioProBench covers protocol understanding but not adaptive execution.
+4. **Multi-modal integration gap**: Existing tools handle text/structured data; wet-lab automation needs visual (plate images) + sensor + text integration.
+
+### Our Novel Contribution
+We design and evaluate a **modular multi-modal AI agent** that:
+1. Uses an LLM backbone with wet-lab-specific tools (protocol generation, error detection, parameter adaptation)
+2. Implements a closed feedback loop: LLM generates protocol → simulated lab execution → sensor-like results → LLM adapts → repeat
+3. Evaluates on BioProBench error correction task — comparing AI-adapted protocols against static protocols
+4. Demonstrates **measurable improvement in protocol quality** through iterative LLM feedback vs. one-shot generation
+
+### Experiment Justification
+- **Experiment 1** (Protocol Generation Quality): Tests if agent can generate valid wet-lab protocols comparable to expert-written ones. Necessary to establish baseline capability.
+- **Experiment 2** (Error Detection &amp; Correction): Tests if agent can identify and fix protocol errors in real-time, simulating the feedback loop. Directly tests the core hypothesis.
+- **Experiment 3** (Iterative Adaptation): Tests if multiple rounds of LLM feedback improve protocol quality over static single-shot generation. Key test of &#34;improved efficiency through adaptation.&#34;
+- **Experiment 4** (Ablation Study): Compares: (a) LLM without tools, (b) LLM with tools, (c) LLM with multi-step feedback. Tests contribution of each component.
+
+---
+
+## Research Question
+Can a multi-modal AI agent with a real-time feedback adaptation loop autonomously generate and refine wet-lab protocols with comparable accuracy to human-designed protocols, while demonstrating improvement over static pre-programmed approaches?
+
+## Background and Motivation
+Current laboratory automation systems execute fixed, pre-programmed scripts. When unexpected results occur (wrong pH, contamination, instrument variation), human intervention is required. AI agents that can interpret results and dynamically adjust protocols would eliminate this bottleneck. Recent work (ChemCrow, GPT-Lab, Agent Laboratory) demonstrates the feasibility of LLM-driven scientific automation, but real-time wet-lab adaptation remains an open problem.
+
+## Hypothesis Decomposition
+
+**H1**: An LLM-based agent can generate wet-lab protocols with &gt;70% accuracy on protocol quality assessment tasks (BioProBench error correction).
+
+**H2**: Iterative feedback adaptation (multi-round LLM refinement) produces protocols with higher accuracy than single-shot generation.
+
+**H3**: A tool-augmented LLM outperforms a vanilla LLM on wet-lab protocol tasks, justifying the modular agent design.
+
+**H4**: The agent can identify protocol errors (wrong concentrations, temperatures, steps) with measurable precision/recall.
+
+## Proposed Methodology
+
+### Approach
+We implement a **WetLabAgent** — a modular LLM-based system with:
+1. **Literature Context Module**: Provides relevant protocol background to the LLM
+2. **Protocol Generation Tool**: Structured protocol generation with parameter validation
+3. **Error Detection Tool**: Identifies protocol errors using domain heuristics + LLM
+4. **Feedback Loop**: Iterative refinement based on simulated experimental outcomes
+5. **Evaluation Harness**: BioProBench-based scoring for protocol accuracy
+
+The agent uses Claude Sonnet 4.5 or Claude claude-sonnet-4-6 as backbone (Anthropic API key available).
+
+### Experimental Steps
+
+1. **Setup &amp; Data Loading** (10 min): Load BioProBench samples (N=10 available), design evaluation prompts
+2. **Baseline Implementation** (15 min): Implement vanilla LLM (no tools, single-shot) as baseline
+3. **Tool-Augmented Agent** (20 min): Add domain-specific tools (parameter validation, protocol structure checking)
+4. **Feedback Loop Implementation** (20 min): Multi-round refinement with simulated observation feedback
+5. **Evaluation** (15 min): Run all conditions on BioProBench error correction task
+6. **Analysis &amp; Visualization** (10 min): Compare conditions, statistical tests, generate plots
+
+### Baselines
+1. **Static protocol** (no AI): Human-written protocols from BioProBench as gold standard
+2. **Vanilla LLM (single-shot)**: Claude without tools, one inference pass
+3. **LLM with domain tools**: Claude with parameter validation + structure checking tools
+4. **LLM with feedback loop (1 round)**: One refinement iteration
+5. **LLM with feedback loop (3 rounds)**: Three refinement iterations ← proposed system
+
+### Evaluation Metrics
+1. **Error Detection Accuracy**: Precision, Recall, F1 for identifying protocol errors
+2. **Correction Accuracy**: Whether corrected protocol matches ground truth
+3. **Parameter Accuracy**: Whether numerical parameters (concentrations, temperatures) are correct
+4. **Improvement Rate**: % of correct answers after N feedback rounds vs. baseline
+5. **Latency**: Time per protocol evaluation (practical efficiency metric)
+
+### Statistical Analysis Plan
+- Paired t-test comparing correction accuracy across conditions (n=10 samples)
+- McNemar&#39;s test for binary classification (correct/incorrect) comparisons
+- Effect size (Cohen&#39;s d) for continuous metrics
+- Bootstrap confidence intervals (1000 samples) given small n=10
+
+## Expected Outcomes
+- H1 supported if vanilla LLM achieves &gt;60% correction accuracy on BioProBench
+- H2 supported if multi-round feedback improves accuracy by &gt;10% over single-shot
+- H3 supported if tool-augmented agent outperforms vanilla LLM
+- H4 supported if error detection F1 &gt; 0.7
+
+## Timeline and Milestones
+- 0-10 min: Environment setup, package installation
+- 10-25 min: Data loading, baseline implementation
+- 25-50 min: Tool-augmented agent + feedback loop
+- 50-70 min: Experiments execution (API calls)
+- 70-85 min: Analysis, visualization
+- 85-100 min: REPORT.md, README.md
+
+## Potential Challenges
+1. **API rate limits**: Mitigate by caching responses, using exponential backoff
+2. **Small dataset (n=10)**: Use bootstrap CIs, note as limitation
+3. **BioProBench format**: May need parsing; handled in data loading step
+4. **API key issues**: ANTHROPIC_API_KEY is confirmed available
+
+## Success Criteria
+- At least 3 experimental conditions evaluated
+- Error correction accuracy &gt;60% for the best agent
+- Clear comparison between static, single-shot, and adaptive approaches
+- Complete REPORT.md with actual numerical results
+
+
+════════════════════════════════════════════════════════════════════════════════
+                          LITERATURE REVIEW
+════════════════════════════════════════════════════════════════════════════════
+
+# Literature Review: Autonomous Multi-Modal AI Agent for Wet-Lab Experiment Design and Execution
+
+**Research Hypothesis**: A multi-modal AI agent integrating literature comprehension, hypothesis generation, and robotic control can autonomously design and execute simple wet-lab experiments with comparable accuracy to human-designed protocols. The agent will demonstrate improved experimental efficiency through real-time feedback adaptation compared to static pre-programmed protocols.
+
+---
+
+## Research Area Overview
+
+The convergence of large language models (LLMs), multi-modal AI, and laboratory robotics has catalyzed a new paradigm of **autonomous scientific discovery**. Systems in this space range from LLMs augmented with domain-specific chemistry tools (ChemCrow, 2023) to fully integrated robotic platforms that execute physical experiments (Coscientist, 2023; GPT-Lab, 2023). Recent surveys (2024–2025) describe a progression from &#34;AI as tool&#34; to &#34;AI as scientist,&#34; with the dominant trend being **closed-loop systems** where AI generates hypotheses, robots execute protocols, results are fed back, and the cycle repeats.
+
+The specific challenge of wet-lab automation remains harder than computational/chemistry tasks due to the physical manipulation requirements, protocol complexity, safety constraints, and the need to handle real biological variability. However, recent systems (autonomous enzyme engineering platforms, Ginkgo+GPT-5 collaboration) show practical viability is approaching.
+
+---
+
+## Key Papers
+
+### Paper 1: ChemCrow: Augmenting Large Language Models with Chemistry Tools
+- **Authors**: Andres M. Bran, Sam Cox, Oliver Schilter, Carlo Baldassari, Andrew D. White, Philippe Schwaller
+- **Year**: 2023
+- **Source**: arXiv:2304.05376
+- **Key Contribution**: First major demonstration of tool-augmented LLMs for autonomous chemistry. Integrated 18 expert-designed chemistry tools (RDKit, PubChem, reaction prediction APIs) into GPT-4 using a ReAct-style (Thought-Action-Observation) framework.
+- **Methodology**: LangChain-based agent with GPT-4 backbone; tools include web search, molecular property prediction, retrosynthesis planning, reaction prediction, and safety checking.
+- **Results**: Autonomously planned/executed synthesis of insect repellent, 3 organocatalysts, discovered novel chromophore. Evaluated on 14 chemical tasks.
+- **Datasets Used**: 14 bespoke chemistry tasks; no standard benchmark
+- **Code Available**: Yes — https://github.com/ur-whitelab/chemcrow-public
+- **Relevance**: Establishes the tool-augmented LLM agent paradigm for laboratory tasks. Our work extends this to multi-modal wet-lab settings with robotic integration.
+
+### Paper 2: Agent Laboratory: Using LLM Agents as Research Assistants
+- **Authors**: Samuel Schmidgall, Yusheng Su, Ze Wang, et al. (AMD, Johns Hopkins, ETH Zurich)
+- **Year**: 2025
+- **Source**: arXiv:2501.04227 (ICLR workshop)
+- **Key Contribution**: End-to-end autonomous research pipeline with three stages: Literature Review → Experimentation → Report Writing. Supports both autonomous and human-in-the-loop (co-pilot) modes.
+- **Methodology**: Specialized LLM agents (PhD agent, Postdoc agent) with tools like mle-solver for ML experimentation and paper-solver for report generation. Uses arXiv, HuggingFace, Python environments.
+- **Results**: o1-preview achieves best outcomes; 84% reduction in research cost vs previous methods; generated ML code achieves state-of-the-art performance; human feedback at each stage significantly improves quality.
+- **Datasets Used**: Various ML benchmarks (CIFAR, etc.) depending on research idea input
+- **Code Available**: Yes — https://github.com/SamuelSchmidgall/AgentLaboratory
+- **Relevance**: Directly relevant as a complete autonomous research pipeline template. Our work adapts this concept from computational ML experiments to physical wet-lab experiments.
+
+### Paper 3: Agentic AI for Scientific Discovery: A Survey of Progress, Challenges, and Future Directions
+- **Authors**: Mourad Gridach, Jay Nanavati, Khaldoun Zine El Abidine, Lenon Mendes, Christina Mack (IQVIA)
+- **Year**: 2025
+- **Source**: arXiv:2503.08979 (ICLR 2025 conference paper)
+- **Key Contribution**: Comprehensive survey of agentic AI systems for scientific discovery. Categorizes systems into autonomous and collaborative frameworks.
+- **Methodology**: Survey of existing systems; defines evaluation metrics, implementation frameworks, and datasets
+- **Key Findings**:
+  - Agentic systems show strong performance in literature review, hypothesis generation, and computational experimentation
+  - Performance drops in literature review automation (structured synthesis remains challenging)
+  - Key frameworks: LangChain, AutoGen, CrewAI for multi-agent orchestration
+  - Evaluation metrics: task success rates, scientific quality scores, reproducibility
+- **Relevance**: Provides comprehensive taxonomy and evaluation framework applicable to our research. Identifies key challenges including system reliability and ethical governance.
+
+### Paper 4: Accelerating Discovery in Natural Science Laboratories with AI and Robotics (IEEE ICRA 2024 Workshop)
+- **Authors**: Andrew I. Cooper, Patrick Courtney, Kourosh Darvish, et al. (Multiple institutions)
+- **Year**: 2025 (proceedings published)
+- **Source**: arXiv:2501.06847
+- **Key Contribution**: Expert perspectives on practical challenges in laboratory automation from leading researchers across materials science, biology, chemistry, and robotics.
+- **Methodology**: Workshop proceedings summarizing challenges, perspectives, and research directions
+- **Key Findings**:
+  - Laboratory automation requires interdisciplinary collaboration (AI + robotics + domain science)
+  - Key challenges: robust flexibility, reproducibility, throughput, standardization
+  - Role of human scientists remains essential despite advances
+  - Existing solutions often rigid (designed for specific tasks with little adaptability)
+  - AI/robotics advances enable more flexible, human-centric automation
+- **Relevance**: Directly addresses the practical engineering challenges our system must solve. Identifies standardization (SiLA protocol) as critical for interoperability.
+
+### Paper 5: Towards Scientific Intelligence: A Survey of LLM-based Scientific Agents
+- **Authors**: Shuo Ren, Can Xie, Pu Jian, et al. (Chinese Academy of Sciences)
+- **Year**: 2025
+- **Source**: arXiv:2503.24047
+- **Key Contribution**: Comprehensive survey of LLM-based scientific agents with focus on architectures, design, benchmarks, and applications.
+- **Methodology**: Survey with focus on why scientific agents differ from general agents (domain-specific knowledge, diverse action spaces, heterogeneous data)
+- **Key Findings**:
+  - Scientific agents require domain-specific tool integration
+  - Validation mechanisms are critical for scientific correctness
+  - Multi-modal capability (images, molecular structures, sequences) is essential
+  - Key benchmarks: LAB-Bench, ScienceAgentBench, BioProBench
+- **Relevance**: Provides design principles for building our multi-modal AI agent. Identifies key technical gaps in current systems.
+
+### Paper 6: From Automation to Autonomy: A Survey on LLMs in Scientific Discovery
+- **Authors**: Tianshi Zheng, Zheye Deng, Hong Ting Tsang, et al. (HKUST)
+- **Year**: 2025
+- **Source**: arXiv:2505.13259
+- **Key Contribution**: Introduces a three-level taxonomy (Tool → Analyst → Scientist) for LLMs in science. Identifies escalating levels of autonomy and responsibility.
+- **Methodology**: Survey structured around 6 stages of scientific method
+- **Key Findings**:
+  - Stage-by-stage analysis: observation, hypothesis, experiment, analysis, conclusions, iteration
+  - Current LLMs primarily operate as &#34;Analyst&#34; level; &#34;Scientist&#34; level requires physical world interaction
+  - Robotic automation is the key enabler for moving from &#34;Analyst&#34; to &#34;Scientist&#34; level
+- **Relevance**: Provides conceptual framework for positioning our research contribution. Our system aims at the &#34;Scientist&#34; level by coupling LLM intelligence with physical robotic execution.
+
+### Paper 7: Scaling Laws in Scientific Discovery with AI and Robot Scientists
+- **Authors**: Pengsong Zhang, Heng Zhang, Huazhe Xu, et al. (Toronto, IIT, Tsinghua)
+- **Year**: 2025
+- **Source**: arXiv:2503.22444
+- **Key Contribution**: Proposes the Autonomous Generalist Scientist (AGS) concept combining agentic AI + embodied robotics for complete research lifecycle automation. Hypothesizes new scaling laws for AI-driven scientific discovery.
+- **Methodology**: Conceptual paper with empirical analysis of existing scaling behaviors
+- **Key Findings**:
+  - Current AI scientists are &#34;virtual&#34; (computational); future AGS requires embodied robotics
+  - AGS could catalyze flywheel effect: more knowledge → better experiments → more knowledge
+  - Key integration needed: LLM for reasoning + robot for physical execution + simulation for validation
+- **Relevance**: Positions our research in the broader vision of autonomous science. Our system is a practical first step toward AGS for wet-lab biology.
+
+### Paper 8: GPT-Lab: Next Generation of Optimal Chemistry Discovery by GPT-Driven Robotic Lab
+- **Authors**: Xiaokai Qin, Mingda Song, Yangguan Chen, et al. (Zhejiang Laboratory)
+- **Year**: 2023
+- **Source**: arXiv:2309.16721
+- **Key Contribution**: First integration of GPT-4 with a robotic chemistry lab for end-to-end materials discovery. Demonstrates literature mining → reagent identification → robotic synthesis pipeline.
+- **Methodology**: GPT-4 analyzes 500 chemistry articles, identifies 18 potential reagents, then robotic platform synthesizes and tests candidates. High-throughput synthesis with real-time feedback.
+- **Results**: Successfully produced humidity colorimetric sensor with RMSE of 2.68%; demonstrated feasibility of GPT-driven robotic experimentation
+- **Datasets Used**: 500 chemistry articles (custom corpus)
+- **Relevance**: Most directly analogous to our work - demonstrates LLM + robotic lab integration. Key difference: our work extends to wet-lab biology and incorporates real-time feedback adaptation.
+
+### Paper 9: Autonomous Agents for Scientific Discovery (Texas A&amp;M, Harvard, MIT)
+- **Authors**: Lianhao Zhou, Hongyi Ling, Cong Fu, et al.
+- **Year**: 2025
+- **Source**: arXiv:2510.09901
+- **Key Contribution**: Examines LLM-based agent orchestration across hypothesis discovery, experimental design/execution, and result analysis. Identifies open research challenges.
+- **Methodology**: Critical survey with focus on practical achievements and limitations
+- **Key Findings**:
+  - Agents perform well on hypothesis generation and literature review
+  - Physical world interaction remains the primary bottleneck
+  - Multi-modal capabilities (vision + language + action) needed for wet-lab tasks
+  - Real-time feedback adaptation is a key unsolved challenge
+- **Relevance**: Directly identifies the research gap our work addresses: real-time feedback adaptation in physical lab settings.
+
+### Paper 10: Large Language Models for Robotics: Opportunities, Challenges, and Perspectives
+- **Authors**: Jiaqi Wang, Zihao Wu, et al. (Northwestern Polytechnical University, University of Georgia)
+- **Year**: 2024
+- **Source**: arXiv:2401.04334
+- **Key Contribution**: Comprehensive survey of LLM integration into robotics, including task planning, manipulation, and human-robot interaction.
+- **Methodology**: Survey + empirical evaluation using multimodal GPT-4V for embodied task planning
+- **Key Findings**:
+  - Text-only LLMs insufficient for embodied tasks (need visual grounding)
+  - GPT-4V significantly enhances robot performance in embodied tasks
+  - Key capability needed: combining language instructions with visual perception
+  - Challenges: precise manipulation, long-horizon planning, safety
+- **Relevance**: Provides the robotics foundation for our multi-modal agent. Justifies use of vision-language models for lab robot control.
+
+---
+
+## Common Methodologies
+
+1. **Tool-augmented LLM Agents (ReAct framework)**: Used in ChemCrow, Agent Laboratory. LLM reasons about which tool to use, calls it, observes result, iterates. Standard pattern for scientific AI agents.
+
+2. **Multi-agent Orchestration**: Used in Agent Laboratory, Virtual Lab, Tippy (drug discovery). Multiple specialized agents (planner, executor, analyzer) collaborate on complex tasks.
+
+3. **Closed-loop Experimental Control**: Used in GPT-Lab, Coscientist. AI generates protocol → robot executes → sensor data fed back → AI adapts → repeat.
+
+4. **Human-in-the-loop (co-pilot mode)**: Used in Agent Laboratory, most practical systems. Humans provide feedback at checkpoints; key finding: this significantly improves quality.
+
+5. **Vision-Language-Action (VLA) Models**: Emerging paradigm for robot control combining visual perception + language reasoning + action generation.
+
+---
+
+## Standard Baselines
+
+- **Human-designed protocols**: Gold standard; AI systems evaluated against expert human protocol quality
+- **Static pre-programmed automation**: Rule-based robotic systems without AI adaptation
+- **GPT-4/GPT-4o without tools**: Baseline language-only performance
+- **ChemCrow**: Strongest tool-augmented LLM baseline for chemistry tasks
+- **Agent Laboratory**: Strong baseline for autonomous research pipeline
+
+---
+
+## Evaluation Metrics
+
+- **Protocol accuracy**: Comparison to expert-designed protocols (human evaluation)
+- **Experimental efficiency**: Time to results, reagent consumption, number of iterations
+- **Success rate**: Fraction of experiments reaching target outcomes
+- **Feedback adaptation speed**: How quickly system adjusts to real-time data
+- **Reproducibility**: Variance across repeated experiments
+- **BioProBench tasks**: Protocol QA accuracy, step ordering EM, error correction F1, protocol generation BLEU
+- **ScienceAgentBench**: Code correctness, execution success rate
+
+---
+
+## Datasets in the Literature
+
+- **BioProBench** (2025): 27K biological protocols, 556K structured instances; 5 tasks for protocol understanding/reasoning. Most relevant to wet-lab protocol design.
+- **ScienceAgentBench** (ICLR 2025): 102 scientific discovery tasks from peer-reviewed papers; evaluates end-to-end scientific programming.
+- **LAB-Bench** (2024): Biology research skills benchmark (literature, databases, sequences).
+- **ChemBench**: Chemistry reasoning benchmarks.
+- **Custom corpora**: Most existing systems use custom chemistry article collections.
+
+---
+
+## Gaps and Opportunities
+
+1. **Gap: Real-time feedback adaptation in physical wet-lab settings** — Current systems either (a) operate in silico only, or (b) use rigid pre-programmed robotic protocols without dynamic AI adaptation. Our research directly addresses this gap.
+
+2. **Gap: Multi-modal integration for wet-lab tasks** — Most systems handle text or structured data. Wet-lab automation requires integrating visual feedback (microscopy images, colorimetric assays), sensor data (pH, temperature, OD measurements), and textual protocol understanding.
+
+3. **Gap: Biology/wet-lab focus vs chemistry focus** — Most autonomous experiment systems focus on chemistry (synthesis, materials). Biology wet-lab automation (cell culture, assays, PCR) remains less developed.
+
+4. **Gap: Protocol validation and error recovery** — Current systems rarely validate protocols against safety and feasibility constraints in real-time, and have limited error recovery capabilities.
+
+5. **Gap: Comparable benchmarks** — No standardized benchmark for end-to-end wet-lab experiment autonomous execution exists. BioProBench covers protocol understanding but not execution.
+
+---
+
+## Recommendations for Our Experiment
+
+**Recommended datasets**:
+1. **BioProBench** (primary): Test our agent&#39;s protocol generation/understanding on established benchmark; compare against 12 existing LLMs as baselines
+2. **ScienceAgentBench** (secondary): Evaluate scientific task completion capabilities
+
+**Recommended baselines**:
+1. Human-designed protocols (expert evaluation)
+2. Static pre-programmed robotic automation (no AI adaptation)
+3. GPT-4o/Claude 3.5 without tools (language-only)
+4. ChemCrow-style tool-augmented LLM (without robotic integration)
+5. Agent Laboratory (without physical execution, computational only)
+
+**Recommended metrics**:
+1. Protocol accuracy (vs. human expert protocols)
+2. Experimental efficiency (time, iterations, reagent use)
+3. Feedback adaptation latency and effectiveness
+4. Success rate on simple biological assays (e.g., cell viability, pH measurement)
+5. BioProBench scores for protocol quality
+
+**Methodological considerations**:
+1. Start with simple, well-characterized biological assays (pH measurement, cell counting, basic colorimetric tests) as proof-of-concept before complex protocols
+2. Implement safety constraints as hard guardrails in the robotic control layer
+3. Use closed-loop feedback (real sensor data → LLM → protocol adaptation) as the key differentiator
+4. Multi-modal input: combine visual outputs (plate images) with numerical sensor readings for LLM context
+5. Use Chain-of-Thought prompting for protocol design to enable interpretability
+6. Document all adaptations to enable comparison of AI-adapted vs static protocols
+
+
+════════════════════════════════════════════════════════════════════════════════
+                          PAPER REQUIREMENTS
+════════════════════════════════════════════════════════════════════════════════
+
+Generate a complete academic paper with the following structure:
+
+1. TITLE
+   - Clear, specific, informative
+   - Should convey main finding or contribution
+
+2. AUTHOR
+   - Use this exact author line in the \author{} block: NeuriCo
+
+3. ABSTRACT (150-250 words)
+   - Problem statement
+   - Approach
+   - Key results
+   - Significance
+
+4. INTRODUCTION
+   - Research problem and motivation
+   - Gap in existing work
+   - Our contribution (be specific)
+   - Paper organization
+
+5. RELATED WORK
+   - Organized by theme/approach
+   - Position our work relative to prior work
+   - Cite papers from literature review
+
+6. METHODOLOGY
+   - Clear description of approach
+   - Experimental setup
+   - Datasets used
+   - Evaluation metrics
+   - Baselines
+
+7. RESULTS
+   - Present results with tables and figures
+   - Statistical analysis
+   - Comparison to baselines
+   - Ablation studies (if applicable)
+
+8. DISCUSSION
+   - Interpretation of results
+   - Limitations
+   - Broader implications
+
+9. CONCLUSION
+   - Summary of contributions
+   - Key findings
+   - Future work
+
+10. REFERENCES
+   - BibTeX format
+   - All cited papers
+
+════════════════════════════════════════════════════════════════════════════════
+                          OUTPUT FORMAT
+════════════════════════════════════════════════════════════════════════════════
+
+Create a MODULAR LaTeX project with the following directory structure:
+
+paper_draft/
+├── main.tex              # Main file that imports all sections
+├── references.bib        # BibTeX references
+├── sections/
+│   ├── abstract.tex      # Abstract content
+│   ├── introduction.tex  # Introduction section
+│   ├── related_work.tex  # Related work section
+│   ├── methodology.tex   # Methodology section
+│   ├── results.tex       # Results section
+│   ├── discussion.tex    # Discussion section
+│   └── conclusion.tex    # Conclusion section
+├── figures/              # Directory for any generated figures
+├── tables/               # Directory for complex standalone tables
+└── appendix/             # Directory for appendix sections (if needed)
+
+INSTRUCTIONS:
+1. First, create the directory structure above (mkdir -p paper_draft/sections paper_draft/figures paper_draft/tables paper_draft/appendix)
+2. Write main.tex using the EXACT preamble for NEURIPS:
+
+   \documentclass{article}
+   \usepackage[final]{neurips_2025}  % NEURIPS style (neurips_2025.sty is in paper_draft/)
+   \usepackage[hidelinks]{hyperref}  % REQUIRED: clickable links
+   \usepackage{booktabs}  % REQUIRED: professional tables
+   \usepackage{graphicx}
+   \usepackage{amsmath,amssymb}
+
+   % Import command files
+   \input{commands/math}
+   \input{commands/general}
+   \input{commands/macros}
+
+   % Use this bibliography style:
+   \bibliographystyle{plainnat}
+
+   \author{NeuriCo}
+
+   - Use \input{sections/...} to include each section
+   - Use \bibliography{references} for references
+3. Write each section file with COMPLETE content (no placeholders)
+4. Each section file should include its \section{} command
+5. Write references.bib with all citations in BibTeX format
+6. After writing all files, compile the paper:
+   cd paper_draft && pdflatex -interaction=nonstopmode main.tex && bibtex main && pdflatex -interaction=nonstopmode main.tex && pdflatex -interaction=nonstopmode main.tex
+
+This modular structure allows humans to easily:
+- Edit individual sections without navigating a large file
+- Track changes per section
+- Reuse sections across different paper versions
+
+════════════════════════════════════════════════════════════════════════════════
+                          QUALITY REQUIREMENTS
+════════════════════════════════════════════════════════════════════════════════
+
+- Academic tone throughout
+- All claims must be supported by data from the experiment report
+- Proper citations using \cite{} commands
+- Clear figures and tables with proper captions
+- NO placeholder text - every section must have real content
+- The paper MUST compile without errors
+- If compilation fails, debug and fix the LaTeX errors
+
+════════════════════════════════════════════════════════════════════════════════
+                          LAB WRITING STYLE
+════════════════════════════════════════════════════════════════════════════════
+
+Follow these lab-specific conventions to match our paper style:
+
+1. LANGUAGE STYLE:
+   - Use active voice: "We propose", "We examine", "We focus on"
+   - Be direct and confident: "Our main question is...", "We hypothesize that..."
+   - State things clearly and simply - prefer plain language over jargon
+   - Use bold questions as paragraph organizers: {\bf what is X?}
+   - Include specific quantitative claims: "8.97% over baseline"
+   - Avoid fancy wording: "utilize" → "use", "facilitate" → "help"
+
+2. INTRODUCTION STRUCTURE:
+   - Engaging hook (get to the point quickly)
+   - Problem importance
+   - Gap identification
+   - Your approach with method figure reference
+   - Quantitative preview of results
+   - Contribution bullets (3-4 items, action verbs)
+
+3. CONTRIBUTION LISTS:
+   \begin{itemize}[leftmargin=*,itemsep=0pt,topsep=0pt]
+       \item We propose...
+       \item We conduct...
+       \item We complement...
+   \end{itemize}
+
+4. MODULAR COMMANDS STRUCTURE:
+   Command templates are pre-copied to paper_draft/commands/:
+   - math.tex: Math notation macros
+   - general.tex: Formatting macros
+   - macros.tex: Project-specific term definitions (customize this for your paper)
+
+   In main.tex, include:
+   \input{commands/math}
+   \input{commands/general}
+   \input{commands/macros}
+
+5. REFERENCE CONVENTIONS:
+   Use reference macros from math.tex:
+   - \figref{fig:name} for "figure 1" (lowercase, in-sentence)
+   - \Figref{fig:name} for "Figure 1" (capitalized, start of sentence)
+   - \secref{sec:name} for "section 2"
+
+6. TEXT FORMATTING:
+   - Use \para{Header text} for bold paragraph headers
+   - Define method/dataset names with \textsc and \xspace:
+     \newcommand{\methodname}{\textsc{MethodName}\xspace}
+
+7. TABLE FORMATTING:
+   - Use booktabs package (no vertical lines)
+   - Use \resizebox{\textwidth}{!}{...} for wide tables
+   - Use @{} to remove padding at table edges
+   - Use \cmidrule(lr){x-y} for sub-headers
+   - Use \textsc{} for dataset/method names in headers
+   - Bold best results with {\bf ...}
+
+8. FIGURE FORMATTING:
+   - Use 0.32\textwidth for 3-column subfigures
+   - Use 0.95\linewidth for full-width figures
+   - Use \input{figures/legend} for shared legends
+   - Write self-contained captions explaining key observations
+
+9. RESULTS PRESENTATION:
+   - Define \increase and \decrease for colored arrows (green up, red down)
+   - Bold best results in tables
+   - Report confidence intervals when available
+
+10. ALGORITHM STYLING:
+    - Use algpseudocode with [noend]
+    - Use \triangleright for comments
+
+11. HYPERLINKS (REQUIRED):
+    - Always use \usepackage[hidelinks]{hyperref} or with colored links
+    - All citations, section refs, figure refs, table refs must be clickable
+    - This is essential for reader navigation
+
+════════════════════════════════════════════════════════════════════════════════
+                          WORKFLOW: REVIEW AND REFLECT
+════════════════════════════════════════════════════════════════════════════════
+
+Before calling finish, you MUST complete these review steps:
+
+1. REVIEW RESOURCES (at the start):
+   - Read .claude/skills/paper-writer/SKILL.md for detailed guidance
+   - Study templates/paper_writing/lab_style_guide.md for style conventions
+   - Browse paper_examples/ for formatting and language patterns
+
+2. SELF-REFLECTION (before finishing):
+   After writing all sections, review your work against these criteria:
+
+   LANGUAGE CHECK:
+   - [ ] Is the writing clear and jargon-free?
+   - [ ] Are claims specific with quantitative support?
+   - [ ] Is active voice used throughout?
+
+   FORMATTING CHECK:
+   - [ ] Does main.tex include \input{commands/math}, \input{commands/general}, \input{commands/macros}?
+   - [ ] Is hyperref package included for clickable references?
+   - [ ] Do tables use booktabs (no vertical lines)?
+   - [ ] Are best results bolded in tables?
+   - [ ] Are figures/tables properly captioned?
+
+   STRUCTURE CHECK:
+   - [ ] Does introduction follow: hook → importance → gap → approach → preview → contributions?
+   - [ ] Are contribution bullets specific with action verbs?
+   - [ ] Does the paper compile without errors?
+
+3. FIX ISSUES:
+   - Address any issues found in the self-reflection
+   - Re-compile and verify the PDF looks correct
+
+Only after completing this review should you consider the paper finished.

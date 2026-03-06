@@ -1,0 +1,53 @@
+\section{Discussion}
+\label{sec:discussion}
+
+\para{Over-correction as a safety risk.}
+The most practically significant finding is the systematic over-correction failure mode.
+In a physical wet-lab, an AI agent that makes unnecessary textual changes to a protocol could introduce ambiguity for downstream steps or for the robotic executor interpreting the corrected protocol.
+Even if the primary error is fixed correctly, reformatting unit strings or simplifying step descriptions could trigger downstream parsing failures.
+We recommend that any deployed protocol correction agent include a \emph{minimal-change constraint}: an explicit instruction to make only the single necessary modification and leave all other text unchanged.
+Based on the semantic vs.\ exact accuracy gap, we estimate this could improve exact-match performance from 30\% to approximately 60\%+, without sacrificing semantic correctness.
+
+\para{Detection capability exceeds correction capability.}
+The 80--90\% detection accuracy achieved across all conditions is substantially higher than exact-match correction accuracy (20--30\%).
+This asymmetry has a practical implication: AI agents are more reliably deployed as \emph{error flags} than as autonomous correctors in high-stakes settings.
+A hybrid workflow where the agent detects the error and proposes a correction for human verification --- rather than applying it autonomously --- would leverage the detection strength while mitigating the correction risks.
+
+\para{Feedback loop benefits depend on error type.}
+The three-round feedback loop provides a 25-percentage-point gain for correct-protocol identification (50\% $\to$ 75\%) but no gain for operation errors (50\% in both conditions).
+This suggests that feedback is most useful for \emph{ambiguous} cases where the simulated executor's passing outcome provides a useful signal to stop revising.
+For hard operation errors where the LLM lacks the domain prior to determine the correct centrifuge speed, additional feedback rounds do not help because the underlying knowledge gap is not resolved by observing a simulated outcome.
+Addressing operation errors would require either fine-tuning on domain-specific procedure knowledge or integrating a structured database of validated centrifuge protocols.
+
+\para{Comparison to \bioprobench baselines.}
+The \bioprobench paper reports 60--80\% accuracy for the strongest LLMs on the error correction subtask using exact-match evaluation~\cite{bioprobench2025}.
+Our semantic accuracy (70--80\%) is consistent with this range, while our exact-match accuracy (20--30\%) is lower.
+The discrepancy likely reflects evaluation setup differences: the \bioprobench leaderboard may use different normalization or partial credit scoring.
+Full comparison requires running on the complete 27,000-sample dataset with the official evaluation script.
+
+\subsection{Limitations}
+\label{sec:discussion:limits}
+
+\para{Small sample size.}
+With $n=10$, all statistical tests are severely underpowered.
+The McNemar test yields $p = 1.0$ for the \feedbackthree vs.\ \vanilla comparison, and confidence intervals for all metrics span 60+ percentage points.
+The qualitative patterns we report --- over-correction, detection-correction gap, operation error difficulty --- are consistent and interpretable, but the numerical differences should not be treated as definitive until replicated on the full \bioprobench dataset ($n = 27{,}000$).
+
+\para{Simulated feedback.}
+The feedback loop uses rule-based simulated observations, not real robotic sensor data.
+The simulated executor applies heuristic checks (\eg detecting whether parameter values are within range) that may not capture the full complexity of physical execution outcomes.
+In a real wet-lab deployment, sensor feedback (pH readings, optical density, fluorescence) would provide richer and more reliable signals than our simulation.
+
+\para{Single model evaluation.}
+We evaluate only \claude as the backbone.
+The over-correction phenomenon and operation error difficulty may vary across model families.
+A comparative evaluation with GPT-5~\cite{openai2025gpt5} or Gemini 2.5 Pro would determine whether these failure modes are general LLM behaviors or specific to the \claude family.
+
+\para{Single-step evaluation.}
+\bioprobench provides isolated protocol steps.
+In practice, protocol errors often propagate: a wrong centrifuge speed in step 3 may produce a cell pellet that causes step 6 to fail.
+Evaluating multi-step protocol correction is a necessary extension for real deployment.
+
+\para{No physical validation.}
+All results are computational.
+Physical wet-lab validation --- actually running the AI-corrected protocols and measuring experimental outcomes --- is required before any deployment claims can be made.

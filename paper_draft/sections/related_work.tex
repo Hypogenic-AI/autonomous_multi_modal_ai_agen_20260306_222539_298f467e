@@ -1,0 +1,26 @@
+\section{Related Work}
+\label{sec:related}
+
+\para{Tool-augmented LLMs for scientific tasks.}
+\citet{bran2023chemcrow} introduced \chemcrow, which augments GPT-4 with 18 chemistry-specific tools (retrosynthesis, reaction prediction, safety checking) using a ReAct-style~\cite{yao2023react} Thought-Action-Observation loop.
+\chemcrow demonstrated autonomous synthesis planning for novel chromophores and organocatalysts, establishing the tool-augmented agent paradigm for laboratory tasks.
+\citet{qin2023gptlab} showed that GPT-4 combined with robotic chemistry platforms can close the loop between literature mining and physical synthesis.
+Unlike these chemistry-focused systems, we target biological wet-lab protocols --- a domain with distinct challenges including cellular variability and tighter parameter tolerances --- and focus specifically on error detection and correction rather than synthesis planning.
+
+\para{Autonomous research pipelines.}
+\citet{schmidgall2025agentlab} introduced \agentlab, an end-to-end research pipeline with specialized LLM agents for literature review, experimentation, and report writing.
+The system supports human-in-the-loop co-pilot mode and achieves 84\% cost reduction versus prior autonomous research methods.
+However, \agentlab targets computational machine learning experiments; adapting it to physical wet-lab tasks requires domain-specific tools and physical execution interfaces.
+Our work is complementary: we focus on the protocol error correction subtask that would be a critical component of any wet-lab analog of \agentlab.
+
+\para{Surveys and taxonomy of agentic AI for science.}
+Several recent surveys~\cite{gridach2025agentic,ren2025scientific,zheng2025automation,zhou2025autonomous,zhang2025scaling} describe the progression from AI-as-tool to AI-as-scientist, with closed-loop feedback as the key enabling mechanism.
+\citet{zhang2025scaling} propose the Autonomous Generalist Scientist (AGS) concept, requiring embodied robotics + LLM reasoning.
+\citet{cooper2025accelerating} identify standardization (SiLA protocol) and flexible manipulation as the primary engineering challenges.
+These surveys motivate our work: the error correction capability we study is a necessary precondition for any closed-loop wet-lab system.
+
+\para{Biological protocol benchmarks.}
+\bioprobench~\cite{bioprobench2025} provides 27,000 biological protocols and 556,000 structured instances across five tasks: protocol quality assessment, step ordering, error correction, parameter prediction, and protocol generation.
+It reports performance for 12 state-of-the-art LLMs, with the strongest achieving 60--80\% accuracy on the error correction subtask.
+\citet{wang2024robotics} surveys LLM integration into robotics, showing that visual grounding (\eg GPT-4V) is essential for embodied tasks.
+Unlike prior \bioprobench evaluations that study single-shot LLM performance, we systematically compare four agent configurations including tool augmentation and multi-round feedback.

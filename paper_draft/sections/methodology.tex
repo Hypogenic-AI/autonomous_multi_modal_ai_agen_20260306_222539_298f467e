@@ -1,0 +1,98 @@
+\section{Methodology}
+\label{sec:method}
+
+\subsection{Problem Formulation}
+\label{sec:method:problem}
+
+Given a biological protocol step $s$ (a text string), the task is to output a corrected version $\hat{s}^*$ and a binary flag $\hat{e} \in \{0, 1\}$ indicating whether $s$ contains an error.
+The ground truth is a pair $(s^*, e)$ where $s^*$ is the expert-corrected protocol and $e$ is the true error indicator.
+We evaluate agents on three metrics derived from $(\hat{s}^*, \hat{e})$: detection accuracy, exact-match correction accuracy, and semantic correction accuracy (defined in \secref{sec:method:eval}).
+
+\subsection{The WetLabAgent System}
+\label{sec:method:agent}
+
+\wetlabagent is a modular system built around \claude~\cite{anthropic2026claude} as the reasoning backbone.
+We evaluate four agent configurations of increasing sophistication.
+
+\para{Condition 1: Vanilla LLM (\vanilla).}
+The agent issues a single prompt to \claude containing the protocol step and requests a JSON-structured response with fields \texttt{has\_error} (boolean) and \texttt{corrected\_text} (string).
+No external tools are called.
+This serves as the baseline measuring the raw capability of \claude on protocol error correction without augmentation.
+
+\para{Condition 2: Tool-Augmented LLM (\toolaug).}
+Before calling the LLM, the agent executes two domain-specific validation tools and appends their outputs to the prompt context:
+\begin{itemize}[leftmargin=*,itemsep=0pt,topsep=0pt]
+    \item \textbf{\texttt{tool\_validate\_parameters}}: Uses regular expressions to extract numerical values and compares them against known biological ranges (CO$_2$: 4--6\%, incubator temperature: 35--39$^\circ$C, ROCK inhibitor dilution: 1:500--1:2000). Returns flagged anomalies.
+    \item \textbf{\texttt{tool\_check\_protocol\_structure}}: Checks structural consistency between the current step and adjacent context steps (purpose, prior step, next step). Returns inconsistencies.
+\end{itemize}
+This tests whether domain-specific validation outputs improve LLM correction accuracy.
+
+\para{Condition 3: Feedback Loop, 1 Round (\feedbackone).}
+After \toolaug generates an initial correction $\hat{s}^*_0$, a simulated execution module applies heuristic checks to $\hat{s}^*_0$ and produces a structured observation: a pass/fail outcome and, on failure, an anomaly type (\eg \texttt{parameter\_out\_of\_range}, \texttt{structural\_inconsistency}).
+This observation is appended to the conversation and the LLM generates a refined correction $\hat{s}^*_1$.
+
+\para{Condition 4: Feedback Loop, 3 Rounds (\feedbackthree).}
+The same simulated execution + LLM refinement loop runs for up to three rounds.
+An early-exit condition terminates the loop when the simulated executor reports a passing outcome, yielding an average of 2.4 API calls per sample.
+This models the closed-loop adaptation cycle that would occur in a physical wet-lab: generate $\to$ execute $\to$ observe $\to$ refine $\to$ repeat.
+
+\subsection{Dataset}
+\label{sec:method:data}
+
+We use the error correction task from \bioprobench~\cite{bioprobench2025}, a benchmark of 27,000 biological protocols with 556,000 structured instances.
+We evaluate on a local sample set of $n=10$ instances drawn from the full dataset.
+Each instance provides: a potentially corrupted protocol step (\texttt{corrupted\_text}), the expert-corrected version (\texttt{corrected\_text}), an error type label, and a correctness flag (\texttt{is\_correct}).
+
+The 10 samples include 6 instances with deliberate errors and 4 correct instances.
+Error types are: parameter (2 instances, \eg CO$_2$ concentration), reagent (2 instances, \eg dilution factor), and operation (2 instances, \eg centrifuge speed).
+For correct instances, the LLM input is \texttt{corrected\_text} and the expected output is \texttt{has\_error=False}.
+\Tabref{tab:dataset} summarizes the sample composition.
+
+\begin{table}[t]
+\centering
+\caption{Sample composition of our \bioprobench evaluation set ($n=10$). Error types cover parameter, reagent, and operation categories; four samples contain no error.}
+\label{tab:dataset}
+\small
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Error Type} & \textbf{Count} & \textbf{Example} \\
+\midrule
+Parameter & 2 & Wrong CO$_2$ concentration (10\% instead of 5\%) \\
+Reagent   & 2 & Wrong ROCK inhibitor dilution (1:100 instead of 1:1000) \\
+Operation & 2 & Wrong centrifuge speed (1600$\times$g instead of 800$\times$g) \\
+Correct   & 4 & No error (LLM should output \texttt{has\_error=False}) \\
+\midrule
+\textbf{Total} & 10 & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Evaluation Metrics}
+\label{sec:method:eval}
+
+We use three primary metrics:
+
+\para{Error Detection Accuracy.}
+Binary accuracy: whether the agent correctly classifies the protocol as containing an error or not.
+For the 6 corrupted samples, detection is a true positive iff \texttt{has\_error=True}.
+For the 4 correct samples, detection is a true negative iff \texttt{has\_error=False}.
+
+\para{Exact Correction Accuracy.}
+Binary accuracy: whether the agent's corrected text exactly matches the ground truth \texttt{corrected\_text} after whitespace normalization.
+This is the strictest evaluation criterion, penalizing any deviation from the reference text including formatting changes.
+
+\para{Semantic Correction Accuracy.}
+Binary accuracy: whether the agent's output contains the correct primary fix, even if it also modifies other parts of the text.
+Evaluated using heuristic string matching for the key changed value (\eg presence of ``5\%'' in a CO$_2$ correction task).
+This better captures the scientific correctness of the correction.
+
+\para{Secondary metrics.}
+We also report average API latency (seconds per sample) and average API call count per sample to quantify the efficiency cost of each condition.
+
+\subsection{Implementation Details}
+\label{sec:method:impl}
+
+All experiments use \claude with temperature 0.0 for determinism, maximum 512 output tokens, and random seed 42 for all stochastic operations.
+The Anthropic Python SDK (v0.84.0) is used for API calls.
+Experiments ran on a CPU-only Linux system (kernel 6.12.72), with a total of approximately 50 API calls across all conditions.
+Statistical comparisons use McNemar's test for binary outcomes with Cohen's $h$ as the effect size measure.

@@ -1,0 +1,6 @@
+{
+  "vanilla_llm": 0.7,
+  "tool_augmented": 0.7,
+  "feedback_loop_1round": 0.7,
+  "feedback_loop_3round": 0.8
+}

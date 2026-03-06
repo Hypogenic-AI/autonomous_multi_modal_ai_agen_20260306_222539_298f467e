@@ -1,0 +1,9 @@
+Biological wet-lab automation systems rely on rigid, pre-programmed protocols that require human intervention when unexpected conditions arise.
+A key capability for autonomous laboratory systems is the real-time detection and correction of protocol errors --- enabling closed-loop adaptation without human checkpoints.
+We present \wetlabagent, a modular AI agent that autonomously detects and corrects errors in biological laboratory protocols using \claude as its reasoning backbone.
+We evaluate four experimental conditions on the \bioprobench error correction benchmark: (1) a single-shot vanilla LLM baseline, (2) a tool-augmented LLM with domain-specific parameter validators, (3) a one-round feedback loop agent, and (4) a three-round closed-loop adaptation agent.
+Using $n=10$ samples from \bioprobench, all conditions achieve high error detection accuracy (80--90\%) but modest exact-match correction accuracy (20--30\%).
+We identify a critical, previously underreported failure mode: LLMs \emph{over-correct} protocols by fixing primary errors while also reformatting surrounding text that should remain unchanged.
+Despite this, \emph{semantic} correction accuracy --- measuring whether the primary error was correctly identified and fixed --- reaches 70--80\%, with the three-round feedback loop achieving the highest semantic accuracy of 80\% (Cohen's $h = 0.23$ over vanilla LLM).
+These findings reveal that AI agents are well-suited for protocol error \emph{detection} but require targeted mitigation of over-correction for reliable deployment.
+We analyze failure modes per error type and provide concrete recommendations for improving exact-match performance through minimal-change prompt constraints.

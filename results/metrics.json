@@ -1,0 +1,88 @@
+{
+  "metrics": {
+    "vanilla_llm": {
+      "n": 10,
+      "detection_accuracy": 0.9,
+      "correction_accuracy": 0.2,
+      "parameter_match_rate": 0.2,
+      "avg_latency_s": 4.619115281105041,
+      "avg_api_calls": 1.0,
+      "correction_acc_ci_lo": 0.0,
+      "correction_acc_ci_hi": 0.4,
+      "per_error_type_correction_acc": {
+        "parameter": 0.0,
+        "reagent": 0.0,
+        "operation": 0.0,
+        "correct": 0.5
+      }
+    },
+    "tool_augmented": {
+      "n": 10,
+      "detection_accuracy": 0.8,
+      "correction_accuracy": 0.3,
+      "parameter_match_rate": 0.3,
+      "avg_latency_s": 3.8939001083374025,
+      "avg_api_calls": 1.0,
+      "correction_acc_ci_lo": 0.1,
+      "correction_acc_ci_hi": 0.6,
+      "per_error_type_correction_acc": {
+        "parameter": 0.0,
+        "reagent": 0.0,
+        "operation": 0.0,
+        "correct": 0.75
+      }
+    },
+    "feedback_loop_1round": {
+      "n": 10,
+      "detection_accuracy": 0.8,
+      "correction_accuracy": 0.3,
+      "parameter_match_rate": 0.3,
+      "avg_latency_s": 4.039618515968323,
+      "avg_api_calls": 1.0,
+      "correction_acc_ci_lo": 0.0,
+      "correction_acc_ci_hi": 0.6,
+      "per_error_type_correction_acc": {
+        "parameter": 0.0,
+        "reagent": 0.0,
+        "operation": 0.0,
+        "correct": 0.75
+      }
+    },
+    "feedback_loop_3round": {
+      "n": 10,
+      "detection_accuracy": 0.9,
+      "correction_accuracy": 0.3,
+      "parameter_match_rate": 0.3,
+      "avg_latency_s": 13.692425084114074,
+      "avg_api_calls": 2.4,
+      "correction_acc_ci_lo": 0.0,
+      "correction_acc_ci_hi": 0.6,
+      "per_error_type_correction_acc": {
+        "parameter": 0.0,
+        "reagent": 0.0,
+        "operation": 0.0,
+        "correct": 0.75
+      }
+    }
+  },
+  "statistical_tests": {
+    "mcnemar_vanilla_vs_feedback3": {
+      "chi2": 0.0,
+      "p_value": 1.0,
+      "b": 0,
+      "c": 1,
+      "interpretation": "Not significant (small n)"
+    },
+    "mcnemar_vanilla_vs_tool": {
+      "chi2": 0.0,
+      "p_value": 1.0,
+      "b": 0,
+      "c": 1,
+      "interpretation": "Not significant (small n)"
+    },
+    "cohens_h_vanilla_vs_feedback3": {
+      "h": 0.2319842627257963,
+      "interpretation": "medium"
+    }
+  }
+}

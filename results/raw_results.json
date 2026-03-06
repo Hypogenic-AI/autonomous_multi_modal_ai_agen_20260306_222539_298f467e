@@ -1,0 +1,692 @@
+[
+  {
+    "sample_id": "TEST-ERR-000000",
+    "condition": "vanilla_llm",
+    "error_type": "parameter",
+    "ground_truth_corrupted": "Maintain hESCs in Nutristem medium on 0.5u/c m^2 vitronectin N-precoated tissue culture-treated plastic in a humidified incubator (37^\u00b0C,10%C0_2).",
+    "ground_truth_corrected": "Maintain hESCs in Nutristem medium on 0.5u/c m^2 vitronectin N-precoated tissue culture-treated plastic in a humidified incubator (37^\u00b0C,5%C0_2).",
+    "llm_corrected_text": "Maintain hESCs in Nutristem medium on 0.5ug/cm^2 vitronectin N-precoated tissue culture-treated plastic in a humidified incubator (37\u00b0C, 5% CO2).",
+    "llm_reasoning": "Two errors were identified: (1) The CO2 concentration is listed as 10% CO2, but the standard condition for hESC culture is 5% CO2. Using 10% CO2 would alter the pH of the medium and negatively affect cell growth. (2) The vitronectin concentration unit 'u/c m^2' appears to be a formatting error and should be 'ug/cm^2' (micrograms per square centimeter), which is the standard unit for coating concentration.",
+    "is_detection_correct": true,
+    "is_correction_correct": false,
+    "parameter_match": false,
+    "num_api_calls": 1,
+    "latency_s": 3.6697471141815186,
+    "tool_outputs": []
+  },
+  {
+    "sample_id": "TEST-ERR-000000",
+    "condition": "tool_augmented",
+    "error_type": "parameter",
+    "ground_truth_corrupted": "Maintain hESCs in Nutristem medium on 0.5u/c m^2 vitronectin N-precoated tissue culture-treated plastic in a humidified incubator (37^\u00b0C,10%C0_2).",
+    "ground_truth_corrected": "Maintain hESCs in Nutristem medium on 0.5u/c m^2 vitronectin N-precoated tissue culture-treated plastic in a humidified incubator (37^\u00b0C,5%C0_2).",
+    "llm_corrected_text": "Maintain hESCs in Nutristem medium on 0.5 \u00b5g/cm\u00b2 vitronectin N-precoated tissue culture-treated plastic in a humidified incubator (37\u00b0C, 5% CO\u2082).",
+    "llm_reasoning": "Two errors were identified: (1) The CO\u2082 concentration is listed as 10% CO\u2082, but the standard condition for hESC culture is 5% CO\u2082. Using 10% CO\u2082 would significantly alter the pH of the bicarbonate-buffered medium and is not standard practice for hESC maintenance. (2) The vitronectin coating concentration unit '0.5u/cm^2' is incorrectly formatted and should be '0.5 \u00b5g/cm\u00b2' (micrograms per square centimeter), which is the standard coating concentration for vitronectin N in hESC culture.",
+    "is_detection_correct": true,
+    "is_correction_correct": false,
+    "parameter_match": false,
+    "num_api_calls": 1,
+    "latency_s": 4.469310522079468,
+    "tool_outputs": [
+      "No obvious parameter issues detected.",
+      "Protocol structure appears consistent with context."
+    ]
+  },
+  {
+    "sample_id": "TEST-ERR-000000",
+    "condition": "feedback_loop_1round",
+    "error_type": "parameter",
+    "ground_truth_corrupted": "Maintain hESCs in Nutristem medium on 0.5u/c m^2 vitronectin N-precoated tissue culture-treated plastic in a humidified incubator (37^\u00b0C,10%C0_2).",
+    "ground_truth_corrected": "Maintain hESCs in Nutristem medium on 0.5u/c m^2 vitronectin N-precoated tissue culture-treated plastic in a humidified incubator (37^\u00b0C,5%C0_2).",
+    "llm_corrected_text": "Maintain hESCs in Nutristem medium on 0.5 \u00b5g/cm\u00b2 vitronectin N-precoated tissue culture-treated plastic in a humidified incubator (37\u00b0C, 5% CO\u2082).",
+    "llm_reasoning": "Two errors were identified: (1) The CO\u2082 concentration is listed as 10% CO\u2082, but the standard condition for hESC culture is 5% CO\u2082. Using 10% CO\u2082 would significantly alter the pH of the bicarbonate-buffered medium and is not standard practice for hESC maintenance. (2) The vitronectin coating concentration unit '0.5u/cm^2' is incorrectly formatted and should be '0.5 \u00b5g/cm\u00b2' (micrograms per square centimeter), which is the standard coating concentration for vitronectin N in hESC culture.",
+    "is_detection_correct": true,
+    "is_correction_correct": false,
+    "parameter_match": false,
+    "num_api_calls": 1,
+    "latency_s": 4.3147711753845215,
+    "tool_outputs": [
+      "No obvious parameter issues detected.",
+      "Protocol structure appears consistent with context."
+    ]
+  },
+  {
+    "sample_id": "TEST-ERR-000000",
+    "condition": "feedback_loop_3round",
+    "error_type": "parameter",
+    "ground_truth_corrupted": "Maintain hESCs in Nutristem medium on 0.5u/c m^2 vitronectin N-precoated tissue culture-treated plastic in a humidified incubator (37^\u00b0C,10%C0_2).",
+    "ground_truth_corrected": "Maintain hESCs in Nutristem medium on 0.5u/c m^2 vitronectin N-precoated tissue culture-treated plastic in a humidified incubator (37^\u00b0C,5%C0_2).",
+    "llm_corrected_text": "Maintain hESCs in Nutristem medium on 0.5 \u00b5g/cm\u00b2 vitronectin N-precoated tissue culture-treated plastic in a humidified incubator (37\u00b0C, 5% CO\u2082).",
+    "llm_reasoning": "Two errors were identified: (1) The CO\u2082 concentration is listed as 10% CO\u2082, but the standard for hESC culture is 5% CO\u2082. Using 10% CO\u2082 would alter the pH of the medium and negatively impact cell growth. (2) The vitronectin coating concentration unit 'u/cm\u00b2' appears to be a formatting/OCR artifact; the correct unit for vitronectin coating is \u00b5g/cm\u00b2 (micrograms per square centimeter), and 0.5 \u00b5g/cm\u00b2 is the standard concentration used for vitronectin N coating of tissue culture plates for hESC maintenance.",
+    "is_detection_correct": true,
+    "is_correction_correct": false,
+    "parameter_match": false,
+    "num_api_calls": 3,
+    "latency_s": 13.827782392501831,
+    "tool_outputs": [
+      "No obvious parameter issues detected.",
+      "Protocol structure appears consistent with context."
+    ]
+  },
+  {
+    "sample_id": "TEST-ERR-000001",
+    "condition": "vanilla_llm",
+    "error_type": "reagent",
+    "ground_truth_corrupted": "Prepare enough Nutristem media for plating (3 mL per 3 cm well of a 6-well plate) with 1:100 ROCK inhibitor.",
+    "ground_truth_corrected": "Prepare enough Nutristem media for plating (3 mL per 3 cm well of a 6-well plate) with 1:1000 ROCK inhibitor.",
+    "llm_corrected_text": "Prepare enough Nutristem media for plating (3 mL per well of a 6-well plate) with 1:1000 ROCK inhibitor.",
+    "llm_reasoning": "Two errors were identified: (1) The ROCK inhibitor (Y-27632) dilution is incorrect. The standard working concentration of Y-27632 is 10 \u00b5M, which is typically achieved with a 1:1000 dilution from a 10 mM stock solution, not 1:100 (which would result in a 100 \u00b5M concentration, potentially toxic to cells). (2) The description '3 cm well of a 6-well plate' is redundant and slightly misleading; a standard 6-well plate well is approximately 35 mm (3.5 cm) in diameter, and the standard volume used is simply described as per well of a 6-well plate.",
+    "is_detection_correct": true,
+    "is_correction_correct": false,
+    "parameter_match": false,
+    "num_api_calls": 1,
+    "latency_s": 4.656735181808472,
+    "tool_outputs": []
+  },
+  {
+    "sample_id": "TEST-ERR-000001",
+    "condition": "tool_augmented",
+    "error_type": "reagent",
+    "ground_truth_corrupted": "Prepare enough Nutristem media for plating (3 mL per 3 cm well of a 6-well plate) with 1:100 ROCK inhibitor.",
+    "ground_truth_corrected": "Prepare enough Nutristem media for plating (3 mL per 3 cm well of a 6-well plate) with 1:1000 ROCK inhibitor.",
+    "llm_corrected_text": "Prepare enough Nutristem media for plating (3 mL per well of a 6-well plate) with 1:1000 ROCK inhibitor.",
+    "llm_reasoning": "The ROCK inhibitor dilution of 1:100 is incorrect. The standard working concentration of ROCK inhibitor (Y-27632) in hESC culture is 10 \u00b5M, which is typically achieved by a 1:1000 dilution from a 10 mM stock solution. A 1:100 dilution would result in a 100 \u00b5M concentration, which is 10-fold too high and could be toxic to cells. The domain tool analysis also flagged 1:100 as outside the normal range of 1:500 to 1:1000.",
+    "is_detection_correct": true,
+    "is_correction_correct": false,
+    "parameter_match": false,
+    "num_api_calls": 1,
+    "latency_s": 3.879643678665161,
+    "tool_outputs": [
+      "Parameter issues found:\n- ROCK inhibitor dilution 1:100 is unusual (normal range: 1:500 to 1:1000).",
+      "Protocol structure appears consistent with context."
+    ]
+  },
+  {
+    "sample_id": "TEST-ERR-000001",
+    "condition": "feedback_loop_1round",
+    "error_type": "reagent",
+    "ground_truth_corrupted": "Prepare enough Nutristem media for plating (3 mL per 3 cm well of a 6-well plate) with 1:100 ROCK inhibitor.",
+    "ground_truth_corrected": "Prepare enough Nutristem media for plating (3 mL per 3 cm well of a 6-well plate) with 1:1000 ROCK inhibitor.",
+    "llm_corrected_text": "Prepare enough Nutristem media for plating (3 mL per well of a 6-well plate) with 1:1000 ROCK inhibitor.",
+    "llm_reasoning": "The ROCK inhibitor dilution of 1:100 is incorrect. The standard working concentration of ROCK inhibitor (Y-27632) in hESC culture is 10 \u00b5M, which is typically achieved by a 1:1000 dilution from a 10 mM stock solution. A 1:100 dilution would result in a 100 \u00b5M concentration, which is 10-fold higher than the recommended concentration and could be toxic to cells. The domain tool analysis also flagged 1:100 as outside the normal range of 1:500 to 1:1000.",
+    "is_detection_correct": true,
+    "is_correction_correct": false,
+    "parameter_match": false,
+    "num_api_calls": 1,
+    "latency_s": 4.139093637466431,
+    "tool_outputs": [
+      "Parameter issues found:\n- ROCK inhibitor dilution 1:100 is unusual (normal range: 1:500 to 1:1000).",
+      "Protocol structure appears consistent with context."
+    ]
+  },
+  {
+    "sample_id": "TEST-ERR-000001",
+    "condition": "feedback_loop_3round",
+    "error_type": "reagent",
+    "ground_truth_corrupted": "Prepare enough Nutristem media for plating (3 mL per 3 cm well of a 6-well plate) with 1:100 ROCK inhibitor.",
+    "ground_truth_corrected": "Prepare enough Nutristem media for plating (3 mL per 3 cm well of a 6-well plate) with 1:1000 ROCK inhibitor.",
+    "llm_corrected_text": "Prepare enough Nutristem media for plating (3 mL per well of a 6-well plate) with 1:1000 ROCK inhibitor (Y-27632).",
+    "llm_reasoning": "The ROCK inhibitor (Y-27632) dilution of 1:100 is incorrect. The standard working concentration of Y-27632 ROCK inhibitor is 10 \u00b5M, which is typically achieved by a 1:1000 dilution from a 10 mM stock solution. A 1:100 dilution would result in a 100 \u00b5M concentration, which is 10-fold too high and could be cytotoxic to hESCs. The correct dilution is 1:1000.",
+    "is_detection_correct": true,
+    "is_correction_correct": false,
+    "parameter_match": false,
+    "num_api_calls": 3,
+    "latency_s": 11.61770248413086,
+    "tool_outputs": [
+      "Parameter issues found:\n- ROCK inhibitor dilution 1:100 is unusual (normal range: 1:500 to 1:1000).",
+      "Protocol structure appears consistent with context."
+    ]
+  },
+  {
+    "sample_id": "TEST-ERR-000002",
+    "condition": "vanilla_llm",
+    "error_type": "operation",
+    "ground_truth_corrupted": "Centrifuge cells in resuspension medium at 2000 rpm for 5 minutes.",
+    "ground_truth_corrected": "Centrifuge cells in resuspension medium at 1000 rpm for 5 minutes.",
+    "llm_corrected_text": "Centrifuge cells at 200 x g (approximately 1000 rpm) for 5 minutes.",
+    "llm_reasoning": "The step mentions centrifuging in 'resuspension medium' which is incorrect at this stage \u2014 the purpose is to pellet cells before resuspension in freezing medium (KSR+DMSO), so the cells should simply be centrifuged in their current suspension medium. Additionally, 2000 rpm is too high for pelleting cells intended for cryopreservation; the standard centrifugation speed for pelleting cells gently is typically 200 x g (~1000 rpm depending on rotor radius) for 5 minutes to avoid cell damage.",
+    "is_detection_correct": true,
+    "is_correction_correct": false,
+    "parameter_match": false,
+    "num_api_calls": 1,
+    "latency_s": 4.204819917678833,
+    "tool_outputs": []
+  },
+  {
+    "sample_id": "TEST-ERR-000002",
+    "condition": "tool_augmented",
+    "error_type": "operation",
+    "ground_truth_corrupted": "Centrifuge cells in resuspension medium at 2000 rpm for 5 minutes.",
+    "ground_truth_corrected": "Centrifuge cells in resuspension medium at 1000 rpm for 5 minutes.",
+    "llm_corrected_text": "Centrifuge cells at 200 \u00d7 g (approximately 1000 rpm) for 5 minutes.",
+    "llm_reasoning": "The step mentions centrifuging cells 'in resuspension medium,' but the purpose of this step is to pellet the cells before resuspension in freezing medium (KSR+DMSO). The cells should be centrifuged in their current suspension medium to form a pellet, not in resuspension medium. Additionally, 2000 rpm is typically too high for pelleting cells intended for cryopreservation; standard centrifugation for cell pelleting is around 200 \u00d7 g (~1000 rpm depending on rotor radius) for 5 minutes to avoid cell damage. The phrase 'in resuspension medium' is incorrect at this stage.",
+    "is_detection_correct": true,
+    "is_correction_correct": false,
+    "parameter_match": false,
+    "num_api_calls": 1,
+    "latency_s": 4.769011974334717,
+    "tool_outputs": [
+      "No obvious parameter issues detected.",
+      "Protocol structure appears consistent with context."
+    ]
+  },
+  {
+    "sample_id": "TEST-ERR-000002",
+    "condition": "feedback_loop_1round",
+    "error_type": "operation",
+    "ground_truth_corrupted": "Centrifuge cells in resuspension medium at 2000 rpm for 5 minutes.",
+    "ground_truth_corrected": "Centrifuge cells in resuspension medium at 1000 rpm for 5 minutes.",
+    "llm_corrected_text": "Centrifuge cells at 200 \u00d7 g (approximately 1000 rpm) for 5 minutes.",
+    "llm_reasoning": "The step mentions centrifuging cells 'in resuspension medium,' but the purpose of this step is to pellet the cells before resuspension in freezing medium (KSR+DMSO). The cells should be centrifuged in their current suspension medium to form a pellet, and the supernatant discarded, so they can then be resuspended in the freezing medium. Additionally, 2000 rpm is typically too high for pelleting cells (especially sensitive stem cells) and can damage them; standard centrifugation for cell pelleting is around 200 \u00d7 g (~1000 rpm) for 5 minutes. The phrase 'in resuspension medium' is also misleading and should be removed.",
+    "is_detection_correct": true,
+    "is_correction_correct": false,
+    "parameter_match": false,
+    "num_api_calls": 1,
+    "latency_s": 5.1127166748046875,
+    "tool_outputs": [
+      "No obvious parameter issues detected.",
+      "Protocol structure appears consistent with context."
+    ]
+  },
+  {
+    "sample_id": "TEST-ERR-000002",
+    "condition": "feedback_loop_3round",
+    "error_type": "operation",
+    "ground_truth_corrupted": "Centrifuge cells in resuspension medium at 2000 rpm for 5 minutes.",
+    "ground_truth_corrected": "Centrifuge cells in resuspension medium at 1000 rpm for 5 minutes.",
+    "llm_corrected_text": "I need to evaluate this centrifugation step for pelleting cells before resuspension in freezing medium.\n\nKey considerations:\n1. The step says \"centrifuge cells in resuspension medium\" - but the purpose is to PELLET cells, and the next step is resuspension in KSR+DMSO freezing medium. The cells shouldn't be in resuspension medium yet at this stage; they should be in their current suspension medium (culture medium) being centrifuged to form a pellet.\n2. The speed: 2000 rpm for cell pelleting - this is on the higher end. Standard cell pelleting for most mammalian cells (including stem cells, which KSR suggests) is typically 200-300 \u00d7 g, which corresponds to roughly 1000-1200 rpm in standard centrifuges. 2000 rpm could be too high and may damage cells, especially sensitive stem cells.\n3. The time: 5 minutes is standard.\n4. The phrase \"in resuspension medium\" is procedurally incorrect - you centrifuge the cells (in their culture medium/suspension) to pellet them, then remove supernatant, then resuspend in freezing medium.\n\nThe primary error here is the use of \"resuspension medium\" in the centrifugation step - cells are being centrifuged to pellet them FROM their current medium, not in resuspension medium. Additionally, 2000 rpm is higher than typical for sensitive cell lines; standard is around 1000-1200 rpm (200-300 \u00d7 g).\n\nGiven the feedback about numerical values being anomalous, the rpm of 2000 is likely the flagged issue. Standard centrifugation for cell pelleting is typically 300 \u00d7 g (~1200 rpm) for 5 minutes.\n\n{\n  \"has_error\": true,\n  \"corrected_text\": \"Centrifuge cells at 300 \u00d7 g (approximately 1200 rpm) for 5 minutes to pellet them.\",\n  \"reasoning\": \"Two errors were identified: (1) The phrase 'in resuspension medium' is incorrect \u2014 at this stage, cells are being centrifuged to pellet them from their current culture medium suspension, not in resuspension medium",
+    "llm_reasoning": "parse error",
+    "is_detection_correct": false,
+    "is_correction_correct": false,
+    "parameter_match": false,
+    "num_api_calls": 3,
+    "latency_s": 27.241185903549194,
+    "tool_outputs": [
+      "No obvious parameter issues detected.",
+      "Protocol structure appears consistent with context."
+    ]
+  },
+  {
+    "sample_id": "TEST-ERR-000003",
+    "condition": "vanilla_llm",
+    "error_type": "correct",
+    "ground_truth_corrupted": "Add 2 mL of room-temperature 0.5 mM EDTA in PBS-/- per well of a 6-well plate.",
+    "ground_truth_corrected": "Add 2 mL of room-temperature 0.5 mM EDTA in PBS-/- per well of a 6-well plate.",
+    "llm_corrected_text": "{\n  \"has_error\": true,\n  \"corrected_text\": \"Add 2 mL of room-temperature 0.5 mM EDTA in PBS-/- per well of a 6-well plate.\",\n  \"reasoning\": \"The concentration of EDTA used for hESC dissociation is typically 0.5 mM, which is correct. However, upon closer review, the standard protocol for hESC passaging uses 0.5 mM EDTA, so the concentration is actually correct. Wait - re-evaluating: the standard EDTA concentration for hESC dissociation is 0.5 mM (500 \u00b5M), which matches. The volume of 2 mL per well of a 6-well plate is also standard. Actually, the step appears correct as written. No error detected.\"\n}\n\nWait, let me reconsider carefully.\n\n{\n  \"has_error\": false,\n  \"corrected_text\": \"Add 2 mL of room-temperature 0.5 mM EDTA in PBS-/- per well of a 6-well plate.\",\n  \"reasoning\": \"The protocol step is correct. The standard concentration for EDTA used to dissociate hESCs is 0.5 mM, the volume of 2 mL per well of a 6-well plate is appropriate, and using PBS-/- (calcium and magnesium free) as the diluent is correct since divalent cations would interfere with EDTA chelation. Room temperature is also appropriate for this step.\"\n}",
+    "llm_reasoning": "parse error",
+    "is_detection_correct": true,
+    "is_correction_correct": false,
+    "parameter_match": false,
+    "num_api_calls": 1,
+    "latency_s": 6.704054117202759,
+    "tool_outputs": []
+  },
+  {
+    "sample_id": "TEST-ERR-000003",
+    "condition": "tool_augmented",
+    "error_type": "correct",
+    "ground_truth_corrupted": "Add 2 mL of room-temperature 0.5 mM EDTA in PBS-/- per well of a 6-well plate.",
+    "ground_truth_corrected": "Add 2 mL of room-temperature 0.5 mM EDTA in PBS-/- per well of a 6-well plate.",
+    "llm_corrected_text": "Add 2 mL of room-temperature 0.5 mM EDTA in PBS-/- per well of a 6-well plate, then incubate for 5-7 minutes at room temperature.",
+    "llm_reasoning": "The structural analysis notes that the next step references incubation but the protocol step does not mention it. For hESC dissociation using EDTA, a standard incubation period of 5-7 minutes at room temperature is required after adding the EDTA solution to allow cells to detach from the culture surface. Without this incubation step, the EDTA cannot effectively chelate calcium ions and dissociate the cells. The corrected step includes the necessary incubation instruction.",
+    "is_detection_correct": false,
+    "is_correction_correct": false,
+    "parameter_match": false,
+    "num_api_calls": 1,
+    "latency_s": 4.463305234909058,
+    "tool_outputs": [
+      "No obvious parameter issues detected.",
+      "Structural notes:\n- Adjacent steps reference incubation but protocol doesn't mention it."
+    ]
+  },
+  {
+    "sample_id": "TEST-ERR-000003",
+    "condition": "feedback_loop_1round",
+    "error_type": "correct",
+    "ground_truth_corrupted": "Add 2 mL of room-temperature 0.5 mM EDTA in PBS-/- per well of a 6-well plate.",
+    "ground_truth_corrected": "Add 2 mL of room-temperature 0.5 mM EDTA in PBS-/- per well of a 6-well plate.",
+    "llm_corrected_text": "Add 2 mL of room-temperature 0.5 mM EDTA in PBS-/- per well of a 6-well plate, then incubate for 5-7 minutes at room temperature.",
+    "llm_reasoning": "The structural analysis notes that the next step references incubation but the protocol step does not mention it. For hESC dissociation using EDTA, a standard incubation period of 5-7 minutes at room temperature is required after adding the EDTA solution to allow cells to detach from the culture surface. Without this incubation step, the EDTA treatment would be incomplete and ineffective. The corrected step incorporates the necessary incubation instruction.",
+    "is_detection_correct": false,
+    "is_correction_correct": false,
+    "parameter_match": false,
+    "num_api_calls": 1,
+    "latency_s": 3.809457302093506,
+    "tool_outputs": [
+      "No obvious parameter issues detected.",
+      "Structural notes:\n- Adjacent steps reference incubation but protocol doesn't mention it."
+    ]
+  },
+  {
+    "sample_id": "TEST-ERR-000003",
+    "condition": "feedback_loop_3round",
+    "error_type": "correct",
+    "ground_truth_corrupted": "Add 2 mL of room-temperature 0.5 mM EDTA in PBS-/- per well of a 6-well plate.",
+    "ground_truth_corrected": "Add 2 mL of room-temperature 0.5 mM EDTA in PBS-/- per well of a 6-well plate.",
+    "llm_corrected_text": "I need to evaluate the EDTA concentration used for hESC dissociation.\n\nThe standard protocol for dissociating hESCs uses EDTA at **0.5 mM** concentration \u2014 wait, let me reconsider. The commonly used EDTA concentration for hESC passaging is **0.5 mM**, but let me verify against standard references.\n\nActually, the widely used protocol (Versene/EDTA for hESC dissociation) typically uses **0.5 mM EDTA** in PBS-/-. However, some protocols use **0.02% EDTA** which is approximately 0.5 mM. \n\nBut looking more carefully: the standard EDTA solution for hESC dissociation is indeed **0.5 mM** EDTA in PBS-/-, which is correct. The volume of 2 mL per well of a 6-well plate is also standard.\n\nWait - re-examining: Some key references (including Beers et al. and the commonly cited hESC passaging protocols) use **0.5 mM EDTA**. This appears correct.\n\nHowever, the feedback suggests numerical values may be anomalous. Let me reconsider the concentration: some protocols actually specify **0.5 mM** while others use **1 mM** EDTA. The most widely cited concentration for gentle hESC dissociation without enzymes is **0.5 mM** \u2014 this is correct per Versene (which is 0.2 g/L EDTA \u2248 0.5 mM).\n\nThe volume (2 mL per well of 6-well plate) is standard. The concentration 0.5 mM is standard. The step appears correct.\n\n{\n  \"has_error\": false,\n  \"corrected_text\": \"Add 2 mL of room-temperature 0.5 mM EDTA in PBS-/- per well of a 6-well plate.\",\n  \"reasoning\": \"The protocol step is correct. The standard concentration for EDTA-based hESC dissociation is 0.5 mM EDTA in PBS-/- (equivalent to Versene solution, ~0.",
+    "llm_reasoning": "parse error",
+    "is_detection_correct": true,
+    "is_correction_correct": false,
+    "parameter_match": false,
+    "num_api_calls": 3,
+    "latency_s": 24.479722023010254,
+    "tool_outputs": [
+      "No obvious parameter issues detected.",
+      "Structural notes:\n- Adjacent steps reference incubation but protocol doesn't mention it."
+    ]
+  },
+  {
+    "sample_id": "TEST-ERR-000004",
+    "condition": "vanilla_llm",
+    "error_type": "correct",
+    "ground_truth_corrupted": "Pre-warm EDTA and E6 to room temperature.",
+    "ground_truth_corrected": "Pre-warm EDTA and E6 to room temperature.",
+    "llm_corrected_text": "Pre-warm PBS/EDTA and E6 to room temperature.",
+    "llm_reasoning": "In cell culture protocols, particularly for passaging pluripotent stem cells, EDTA is typically used as a PBS/EDTA solution (e.g., 0.5 mM EDTA in PBS) rather than pure EDTA. The reagent should be referred to as PBS/EDTA (or EDTA in PBS) to accurately reflect the solution being used. Pure EDTA is not directly applied to cells; it is the PBS-buffered EDTA solution that is used for cell dissociation.",
+    "is_detection_correct": false,
+    "is_correction_correct": false,
+    "parameter_match": false,
+    "num_api_calls": 1,
+    "latency_s": 3.7023489475250244,
+    "tool_outputs": []
+  },
+  {
+    "sample_id": "TEST-ERR-000004",
+    "condition": "tool_augmented",
+    "error_type": "correct",
+    "ground_truth_corrupted": "Pre-warm EDTA and E6 to room temperature.",
+    "ground_truth_corrected": "Pre-warm EDTA and E6 to room temperature.",
+    "llm_corrected_text": "Pre-warm EDTA and E6 to room temperature.",
+    "llm_reasoning": "The protocol step is correct as written. Pre-warming EDTA and E6 medium to room temperature before use is standard practice to avoid thermal shock to cells. Both reagents are commonly used in cell culture protocols, and the instruction is consistent with the stated purpose and surrounding context.",
+    "is_detection_correct": true,
+    "is_correction_correct": true,
+    "parameter_match": true,
+    "num_api_calls": 1,
+    "latency_s": 2.575761079788208,
+    "tool_outputs": [
+      "No obvious parameter issues detected.",
+      "Protocol structure appears consistent with context."
+    ]
+  },
+  {
+    "sample_id": "TEST-ERR-000004",
+    "condition": "feedback_loop_1round",
+    "error_type": "correct",
+    "ground_truth_corrupted": "Pre-warm EDTA and E6 to room temperature.",
+    "ground_truth_corrected": "Pre-warm EDTA and E6 to room temperature.",
+    "llm_corrected_text": "Pre-warm EDTA and E6 to room temperature.",
+    "llm_reasoning": "The step is consistent with the context of pre-warming reagents to room temperature before use. EDTA (used for cell dissociation) and E6 (Essential 6 medium, a defined cell culture medium) are both commonly pre-warmed to room temperature to avoid thermal shock to cells. No errors in reagent names, temperatures, or procedural steps are detected.",
+    "is_detection_correct": true,
+    "is_correction_correct": true,
+    "parameter_match": true,
+    "num_api_calls": 1,
+    "latency_s": 3.369478940963745,
+    "tool_outputs": [
+      "No obvious parameter issues detected.",
+      "Protocol structure appears consistent with context."
+    ]
+  },
+  {
+    "sample_id": "TEST-ERR-000004",
+    "condition": "feedback_loop_3round",
+    "error_type": "correct",
+    "ground_truth_corrupted": "Pre-warm EDTA and E6 to room temperature.",
+    "ground_truth_corrected": "Pre-warm EDTA and E6 to room temperature.",
+    "llm_corrected_text": "Pre-warm EDTA and E6 to room temperature.",
+    "llm_reasoning": "The step is consistent with the context of pre-warming reagents to room temperature before use. EDTA (used for cell dissociation) and E6 medium are both commonly pre-warmed to room temperature to avoid thermal shock to cells. No errors in reagent names, temperatures, or procedural steps are detected.",
+    "is_detection_correct": true,
+    "is_correction_correct": true,
+    "parameter_match": true,
+    "num_api_calls": 1,
+    "latency_s": 3.087702751159668,
+    "tool_outputs": [
+      "No obvious parameter issues detected.",
+      "Protocol structure appears consistent with context."
+    ]
+  },
+  {
+    "sample_id": "TEST-ERR-000005",
+    "condition": "vanilla_llm",
+    "error_type": "correct",
+    "ground_truth_corrupted": "Add 150 \u00b5L of fresh E6 to each well using the multichannel micropipette.",
+    "ground_truth_corrected": "Add 150 \u00b5L of fresh E6 to each well using the multichannel micropipette.",
+    "llm_corrected_text": "Add 150 \u00b5L of fresh E6 to each well using the multichannel micropipette.",
+    "llm_reasoning": "The protocol step appears correct. Adding 150 \u00b5L of fresh E6 medium to each well using a multichannel micropipette is a standard and reasonable procedure for medium replenishment after aspiration of old medium. The volume (150 \u00b5L) is appropriate for small-scale well plates (e.g., 96-well plates), E6 is a commonly used defined medium (e.g., for iPSC culture), and the use of a multichannel micropipette is appropriate for efficiency. No errors in concentration, temperature, volume, reagent name, or procedural steps are apparent.",
+    "is_detection_correct": true,
+    "is_correction_correct": true,
+    "parameter_match": true,
+    "num_api_calls": 1,
+    "latency_s": 3.524836540222168,
+    "tool_outputs": []
+  },
+  {
+    "sample_id": "TEST-ERR-000005",
+    "condition": "tool_augmented",
+    "error_type": "correct",
+    "ground_truth_corrupted": "Add 150 \u00b5L of fresh E6 to each well using the multichannel micropipette.",
+    "ground_truth_corrected": "Add 150 \u00b5L of fresh E6 to each well using the multichannel micropipette.",
+    "llm_corrected_text": "Add 150 \u00b5L of fresh E6 to each well using the multichannel micropipette.",
+    "llm_reasoning": "The protocol step appears correct. It specifies a volume (150 \u00b5L), the correct medium (E6, commonly used for stem cell culture), the target location (each well), and the appropriate tool (multichannel micropipette). The domain tool analysis found no obvious parameter issues. The structural notes mention that the purpose references 'medium' and the protocol text lacks medium/volume references, but this appears to be a mismatch in the structural analysis rather than an error in the step itself \u2014 the step clearly does reference a medium (E6) and a volume (150 \u00b5L). No correction is needed.",
+    "is_detection_correct": true,
+    "is_correction_correct": true,
+    "parameter_match": true,
+    "num_api_calls": 1,
+    "latency_s": 3.8781917095184326,
+    "tool_outputs": [
+      "No obvious parameter issues detected.",
+      "Structural notes:\n- Protocol mentions medium in purpose but protocol text lacks medium/volume references.\n- Adjacent steps reference incubation but protocol doesn't mention it."
+    ]
+  },
+  {
+    "sample_id": "TEST-ERR-000005",
+    "condition": "feedback_loop_1round",
+    "error_type": "correct",
+    "ground_truth_corrupted": "Add 150 \u00b5L of fresh E6 to each well using the multichannel micropipette.",
+    "ground_truth_corrected": "Add 150 \u00b5L of fresh E6 to each well using the multichannel micropipette.",
+    "llm_corrected_text": "Add 150 \u00b5L of fresh E6 to each well using the multichannel micropipette.",
+    "llm_reasoning": "The protocol step appears correct. It specifies a volume (150 \u00b5L), the correct medium (E6, commonly used for stem cell culture), the target location (each well), and the appropriate tool (multichannel micropipette). The domain tool analysis found no obvious parameter issues. The structural notes mention that the protocol lacks medium/volume references, but these are clearly present in the step text. The step logically follows aspiration of old medium and precedes returning the plate to the incubator, fitting the purpose of maintaining nutrient supply and removing waste products.",
+    "is_detection_correct": true,
+    "is_correction_correct": true,
+    "parameter_match": true,
+    "num_api_calls": 1,
+    "latency_s": 4.735153913497925,
+    "tool_outputs": [
+      "No obvious parameter issues detected.",
+      "Structural notes:\n- Protocol mentions medium in purpose but protocol text lacks medium/volume references.\n- Adjacent steps reference incubation but protocol doesn't mention it."
+    ]
+  },
+  {
+    "sample_id": "TEST-ERR-000005",
+    "condition": "feedback_loop_3round",
+    "error_type": "correct",
+    "ground_truth_corrupted": "Add 150 \u00b5L of fresh E6 to each well using the multichannel micropipette.",
+    "ground_truth_corrected": "Add 150 \u00b5L of fresh E6 to each well using the multichannel micropipette.",
+    "llm_corrected_text": "Add 150 \u00b5L of fresh E6 to each well using the multichannel micropipette.",
+    "llm_reasoning": "The protocol step appears correct. It specifies a volume (150 \u00b5L), the correct medium (E6, commonly used for stem cell culture), the target location (each well), and the appropriate tool (multichannel micropipette). The domain tool analysis found no obvious parameter issues. The structural notes mention that the purpose references 'medium' and the protocol text lacks medium/volume references, but this appears to be a mismatch in the structural analysis rather than an error in the step itself \u2014 the step clearly does reference a medium (E6) and a volume (150 \u00b5L). No correction is needed.",
+    "is_detection_correct": true,
+    "is_correction_correct": true,
+    "parameter_match": true,
+    "num_api_calls": 1,
+    "latency_s": 4.114685535430908,
+    "tool_outputs": [
+      "No obvious parameter issues detected.",
+      "Structural notes:\n- Protocol mentions medium in purpose but protocol text lacks medium/volume references.\n- Adjacent steps reference incubation but protocol doesn't mention it."
+    ]
+  },
+  {
+    "sample_id": "TEST-ERR-000006",
+    "condition": "vanilla_llm",
+    "error_type": "parameter",
+    "ground_truth_corrupted": "Spin the cells at 1600\u00d7 g for 5 min.",
+    "ground_truth_corrected": "Spin the cells at 800\u00d7 g for 5 min.",
+    "llm_corrected_text": "Spin the cells at 400\u00d7 g for 5 min.",
+    "llm_reasoning": "For bone marrow cell isolation, centrifugation is typically performed at 300-400\u00d7 g for 5 minutes. Spinning at 1600\u00d7 g is too high and would damage the cells, potentially lysing fragile bone marrow cells and causing unwanted cell death. Standard protocols for bone marrow cell pelleting use 400\u00d7 g (approximately 1500 rpm in a standard centrifuge) to gently pellet cells without causing damage.",
+    "is_detection_correct": true,
+    "is_correction_correct": false,
+    "parameter_match": false,
+    "num_api_calls": 1,
+    "latency_s": 5.888200998306274,
+    "tool_outputs": []
+  },
+  {
+    "sample_id": "TEST-ERR-000006",
+    "condition": "tool_augmented",
+    "error_type": "parameter",
+    "ground_truth_corrupted": "Spin the cells at 1600\u00d7 g for 5 min.",
+    "ground_truth_corrected": "Spin the cells at 800\u00d7 g for 5 min.",
+    "llm_corrected_text": "Spin the cells at 400\u00d7 g for 5 min.",
+    "llm_reasoning": "For bone marrow cell isolation, the standard centrifugation speed is typically 300\u2013400\u00d7 g for 5\u201310 minutes. Spinning at 1600\u00d7 g is too high and would damage the cells, potentially lysing fragile bone marrow cells and reducing viability. The correct speed for pelleting bone marrow cells is 400\u00d7 g for 5 min.",
+    "is_detection_correct": true,
+    "is_correction_correct": false,
+    "parameter_match": false,
+    "num_api_calls": 1,
+    "latency_s": 3.179429531097412,
+    "tool_outputs": [
+      "No obvious parameter issues detected.",
+      "Protocol structure appears consistent with context."
+    ]
+  },
+  {
+    "sample_id": "TEST-ERR-000006",
+    "condition": "feedback_loop_1round",
+    "error_type": "parameter",
+    "ground_truth_corrupted": "Spin the cells at 1600\u00d7 g for 5 min.",
+    "ground_truth_corrected": "Spin the cells at 800\u00d7 g for 5 min.",
+    "llm_corrected_text": "Spin the cells at 400\u00d7 g for 5 min.",
+    "llm_reasoning": "For bone marrow cell isolation, the standard centrifugation speed is typically 300\u2013400\u00d7 g for 5 minutes. Spinning at 1600\u00d7 g is too high and would pellet dead cells, debris, and potentially damage the cells. The correct speed for pelleting bone marrow cells without causing damage is 400\u00d7 g (approximately 1500 rpm in a standard centrifuge).",
+    "is_detection_correct": true,
+    "is_correction_correct": false,
+    "parameter_match": false,
+    "num_api_calls": 1,
+    "latency_s": 3.2693841457366943,
+    "tool_outputs": [
+      "No obvious parameter issues detected.",
+      "Protocol structure appears consistent with context."
+    ]
+  },
+  {
+    "sample_id": "TEST-ERR-000006",
+    "condition": "feedback_loop_3round",
+    "error_type": "parameter",
+    "ground_truth_corrupted": "Spin the cells at 1600\u00d7 g for 5 min.",
+    "ground_truth_corrected": "Spin the cells at 800\u00d7 g for 5 min.",
+    "llm_corrected_text": "Spin the cells at 300\u00d7 g for 5 min.",
+    "llm_reasoning": "1600\u00d7 g is too high for bone marrow cell centrifugation during isolation for dendritic cell generation. The standard centrifugation speed for pelleting bone marrow cells is 300\u00d7 g (approximately 1200 rpm) for 5 minutes. Using 1600\u00d7 g could damage the cells and is not consistent with standard bone marrow isolation protocols. The correct parameter is 300\u00d7 g for 5 min.",
+    "is_detection_correct": true,
+    "is_correction_correct": false,
+    "parameter_match": false,
+    "num_api_calls": 3,
+    "latency_s": 16.18938708305359,
+    "tool_outputs": [
+      "No obvious parameter issues detected.",
+      "Protocol structure appears consistent with context."
+    ]
+  },
+  {
+    "sample_id": "TEST-ERR-000007",
+    "condition": "vanilla_llm",
+    "error_type": "reagent",
+    "ground_truth_corrupted": "Resuspend the cell pellets in 10mL of culture media (RPMI 1460 containing 10% FBS, 100U/mL of penicillin/streptomycin, 2 mM lglutamine, and 500mM \u03b2-mercaptoethanol).",
+    "ground_truth_corrected": "Resuspend the cell pellets in 10mL of culture media (RPMI 1460 containing 10% FBS, 100U/mL of penicillin/streptomycin, 2 mM lglutamine, and 50mM \u03b2-mercaptoethanol).",
+    "llm_corrected_text": "Resuspend the cell pellets in 10mL of culture media (RPMI 1640 containing 10% FBS, 100U/mL of penicillin/streptomycin, 2 mM l-glutamine, and 50\u00b5M \u03b2-mercaptoethanol).",
+    "llm_reasoning": "Two errors were identified: (1) The culture media is named 'RPMI 1460' which is incorrect; the correct name is 'RPMI 1640'. (2) The concentration of \u03b2-mercaptoethanol is listed as '500mM', which is extremely toxic and would kill cells. The standard working concentration of \u03b2-mercaptoethanol in cell culture media is 50\u00b5M (micromolar), not 500mM (millimolar).",
+    "is_detection_correct": true,
+    "is_correction_correct": false,
+    "parameter_match": false,
+    "num_api_calls": 1,
+    "latency_s": 3.8717947006225586,
+    "tool_outputs": []
+  },
+  {
+    "sample_id": "TEST-ERR-000007",
+    "condition": "tool_augmented",
+    "error_type": "reagent",
+    "ground_truth_corrupted": "Resuspend the cell pellets in 10mL of culture media (RPMI 1460 containing 10% FBS, 100U/mL of penicillin/streptomycin, 2 mM lglutamine, and 500mM \u03b2-mercaptoethanol).",
+    "ground_truth_corrected": "Resuspend the cell pellets in 10mL of culture media (RPMI 1460 containing 10% FBS, 100U/mL of penicillin/streptomycin, 2 mM lglutamine, and 50mM \u03b2-mercaptoethanol).",
+    "llm_corrected_text": "Resuspend the cell pellets in 10mL of culture media (RPMI 1640 containing 10% FBS, 100U/mL of penicillin/streptomycin, 2 mM L-glutamine, and 50\u00b5M \u03b2-mercaptoethanol).",
+    "llm_reasoning": "Two errors were identified: (1) The culture media is listed as 'RPMI 1460', which is not a valid formulation. The correct name is 'RPMI 1640', a standard cell culture medium. The digits were transposed. (2) The concentration of \u03b2-mercaptoethanol is listed as '500mM', which is extremely toxic to cells. The standard working concentration of \u03b2-mercaptoethanol in cell culture media is 50\u00b5M (micromolar), not 500mM (millimolar). This is a 10,000-fold difference and would be lethal to the cells.",
+    "is_detection_correct": true,
+    "is_correction_correct": false,
+    "parameter_match": false,
+    "num_api_calls": 1,
+    "latency_s": 4.703368186950684,
+    "tool_outputs": [
+      "Parameter issues found:\n- CO2=1460.0% is unusual for cell culture (normal: 5%). Typical cell culture uses 5% CO2.",
+      "Protocol structure appears consistent with context."
+    ]
+  },
+  {
+    "sample_id": "TEST-ERR-000007",
+    "condition": "feedback_loop_1round",
+    "error_type": "reagent",
+    "ground_truth_corrupted": "Resuspend the cell pellets in 10mL of culture media (RPMI 1460 containing 10% FBS, 100U/mL of penicillin/streptomycin, 2 mM lglutamine, and 500mM \u03b2-mercaptoethanol).",
+    "ground_truth_corrected": "Resuspend the cell pellets in 10mL of culture media (RPMI 1460 containing 10% FBS, 100U/mL of penicillin/streptomycin, 2 mM lglutamine, and 50mM \u03b2-mercaptoethanol).",
+    "llm_corrected_text": "Resuspend the cell pellets in 10mL of culture media (RPMI 1640 containing 10% FBS, 100U/mL of penicillin/streptomycin, 2 mM L-glutamine, and 50\u00b5M \u03b2-mercaptoethanol).",
+    "llm_reasoning": "Two errors were identified: (1) The culture media is listed as 'RPMI 1460' which is not a valid formulation. The correct name is 'RPMI 1640', a standard cell culture medium. The digits were transposed. (2) The concentration of \u03b2-mercaptoethanol is listed as '500mM', which is extremely toxic to cells. The correct working concentration for cell culture is 50\u00b5M (micromolar), which is 10,000-fold lower. 500mM \u03b2-mercaptoethanol would be lethal to the cells.",
+    "is_detection_correct": true,
+    "is_correction_correct": false,
+    "parameter_match": false,
+    "num_api_calls": 1,
+    "latency_s": 4.731836795806885,
+    "tool_outputs": [
+      "Parameter issues found:\n- CO2=1460.0% is unusual for cell culture (normal: 5%). Typical cell culture uses 5% CO2.",
+      "Protocol structure appears consistent with context."
+    ]
+  },
+  {
+    "sample_id": "TEST-ERR-000007",
+    "condition": "feedback_loop_3round",
+    "error_type": "reagent",
+    "ground_truth_corrupted": "Resuspend the cell pellets in 10mL of culture media (RPMI 1460 containing 10% FBS, 100U/mL of penicillin/streptomycin, 2 mM lglutamine, and 500mM \u03b2-mercaptoethanol).",
+    "ground_truth_corrected": "Resuspend the cell pellets in 10mL of culture media (RPMI 1460 containing 10% FBS, 100U/mL of penicillin/streptomycin, 2 mM lglutamine, and 50mM \u03b2-mercaptoethanol).",
+    "llm_corrected_text": "Resuspend the cell pellets in 10mL of culture media (RPMI 1640 containing 10% FBS, 100U/mL of penicillin/streptomycin, 2 mM L-glutamine, and 50\u00b5M \u03b2-mercaptoethanol).",
+    "llm_reasoning": "Two errors were identified: (1) 'RPMI 1460' is not a valid media formulation \u2014 the correct name is 'RPMI 1640'. (2) The concentration of \u03b2-mercaptoethanol is listed as '500mM', which is far too high and would be cytotoxic. The standard working concentration of \u03b2-mercaptoethanol in cell culture media is 50\u00b5M (micromolar), not 500mM (millimolar). This is a 10,000-fold difference and would kill the cells. The corrected concentration is 50\u00b5M \u03b2-mercaptoethanol.",
+    "is_detection_correct": true,
+    "is_correction_correct": false,
+    "parameter_match": false,
+    "num_api_calls": 3,
+    "latency_s": 13.731991052627563,
+    "tool_outputs": [
+      "Parameter issues found:\n- CO2=1460.0% is unusual for cell culture (normal: 5%). Typical cell culture uses 5% CO2.",
+      "Protocol structure appears consistent with context."
+    ]
+  },
+  {
+    "sample_id": "TEST-ERR-000008",
+    "condition": "vanilla_llm",
+    "error_type": "operation",
+    "ground_truth_corrupted": "Centrifuge at 800\u00d7 g for 5 min at 25\u00b0C.",
+    "ground_truth_corrected": "Centrifuge at 800\u00d7 g for 5 min at 4\u00b0C.",
+    "llm_corrected_text": "Centrifuge at 300\u00d7 g for 5 min at 4\u00b0C.",
+    "llm_reasoning": "Two errors are present: (1) The centrifugation speed of 800\u00d7 g is too high for collecting dendritic cells and would damage them. The standard speed for pelleting DCs (and most primary immune cells) is 300\u00d7 g. (2) The temperature of 25\u00b0C is inappropriate for collecting cells intended for immunological analysis or transplantation, as it can affect cell viability and surface marker expression. Centrifugation should be performed at 4\u00b0C to preserve cell integrity and minimize metabolic activity during processing.",
+    "is_detection_correct": true,
+    "is_correction_correct": false,
+    "parameter_match": false,
+    "num_api_calls": 1,
+    "latency_s": 6.03333044052124,
+    "tool_outputs": []
+  },
+  {
+    "sample_id": "TEST-ERR-000008",
+    "condition": "tool_augmented",
+    "error_type": "operation",
+    "ground_truth_corrupted": "Centrifuge at 800\u00d7 g for 5 min at 25\u00b0C.",
+    "ground_truth_corrected": "Centrifuge at 800\u00d7 g for 5 min at 4\u00b0C.",
+    "llm_corrected_text": "Centrifuge at 800\u00d7 g for 5 min at 25\u00b0C.",
+    "llm_reasoning": "The centrifugation parameters are appropriate for collecting mature BM-DCs. 800\u00d7 g for 5 minutes at 25\u00b0C (room temperature) is a standard and acceptable condition for pelleting dendritic cells without damaging them. The speed is within the typical range (300\u2013800\u00d7 g) used for DC collection, the duration is appropriate, and room temperature is acceptable for this step prior to flow cytometry analysis. No error is detected.",
+    "is_detection_correct": false,
+    "is_correction_correct": false,
+    "parameter_match": false,
+    "num_api_calls": 1,
+    "latency_s": 3.5352776050567627,
+    "tool_outputs": [
+      "No obvious parameter issues detected.",
+      "Protocol structure appears consistent with context."
+    ]
+  },
+  {
+    "sample_id": "TEST-ERR-000008",
+    "condition": "feedback_loop_1round",
+    "error_type": "operation",
+    "ground_truth_corrupted": "Centrifuge at 800\u00d7 g for 5 min at 25\u00b0C.",
+    "ground_truth_corrected": "Centrifuge at 800\u00d7 g for 5 min at 4\u00b0C.",
+    "llm_corrected_text": "Centrifuge at 800\u00d7 g for 5 min at 25\u00b0C.",
+    "llm_reasoning": "The centrifugation parameters are appropriate for collecting mature BM-DCs. 800\u00d7 g for 5 minutes at 25\u00b0C (room temperature) is a standard and acceptable condition for pelleting dendritic cells without damaging them. The speed is within the typical range (300\u2013800\u00d7 g) used for DC collection, the duration is appropriate, and room temperature is acceptable for this step prior to flow cytometry analysis. No error is detected.",
+    "is_detection_correct": false,
+    "is_correction_correct": false,
+    "parameter_match": false,
+    "num_api_calls": 1,
+    "latency_s": 3.7540435791015625,
+    "tool_outputs": [
+      "No obvious parameter issues detected.",
+      "Protocol structure appears consistent with context."
+    ]
+  },
+  {
+    "sample_id": "TEST-ERR-000008",
+    "condition": "feedback_loop_3round",
+    "error_type": "operation",
+    "ground_truth_corrupted": "Centrifuge at 800\u00d7 g for 5 min at 25\u00b0C.",
+    "ground_truth_corrected": "Centrifuge at 800\u00d7 g for 5 min at 4\u00b0C.",
+    "llm_corrected_text": "Centrifuge at 400\u00d7 g for 5 min at 4\u00b0C.",
+    "llm_reasoning": "For collecting dendritic cells (DCs), the standard centrifugation speed is 400\u00d7 g, not 800\u00d7 g. Higher speeds (800\u00d7 g) can damage fragile DCs and are typically used for pelleting bacteria or debris. Additionally, cell collection centrifugation for sensitive immune cells like BM-DCs is typically performed at 4\u00b0C to preserve cell viability and surface marker integrity, especially important prior to flow cytometry analysis. 25\u00b0C is not standard for this step.",
+    "is_detection_correct": true,
+    "is_correction_correct": false,
+    "parameter_match": false,
+    "num_api_calls": 3,
+    "latency_s": 19.416471242904663,
+    "tool_outputs": [
+      "No obvious parameter issues detected.",
+      "Protocol structure appears consistent with context."
+    ]
+  },
+  {
+    "sample_id": "TEST-ERR-000009",
+    "condition": "vanilla_llm",
+    "error_type": "correct",
+    "ground_truth_corrupted": "Add 20 ng/mL granulocyte-macrophage colony-stimulating factor (GM-CSF) to the cell suspension.",
+    "ground_truth_corrected": "Add 20 ng/mL granulocyte-macrophage colony-stimulating factor (GM-CSF) to the cell suspension.",
+    "llm_corrected_text": "Add 20 ng/mL granulocyte-macrophage colony-stimulating factor (GM-CSF) to the cell suspension.",
+    "llm_reasoning": "The concentration of 20 ng/mL GM-CSF is a standard and widely used concentration for bone marrow-derived dendritic cell (BMDC) or macrophage differentiation cultures. This falls within the commonly reported range of 10-20 ng/mL GM-CSF used in such protocols. The reagent name is correct, and the procedural step is appropriate given the context of initiating bone marrow cell culture. No error is detected.",
+    "is_detection_correct": true,
+    "is_correction_correct": true,
+    "parameter_match": true,
+    "num_api_calls": 1,
+    "latency_s": 3.9352848529815674,
+    "tool_outputs": []
+  },
+  {
+    "sample_id": "TEST-ERR-000009",
+    "condition": "tool_augmented",
+    "error_type": "correct",
+    "ground_truth_corrupted": "Add 20 ng/mL granulocyte-macrophage colony-stimulating factor (GM-CSF) to the cell suspension.",
+    "ground_truth_corrected": "Add 20 ng/mL granulocyte-macrophage colony-stimulating factor (GM-CSF) to the cell suspension.",
+    "llm_corrected_text": "Add 20 ng/mL granulocyte-macrophage colony-stimulating factor (GM-CSF) to the cell suspension.",
+    "llm_reasoning": "The protocol step appears correct. A concentration of 20 ng/mL GM-CSF is a standard and widely used concentration for bone marrow-derived macrophage (BMDM) or dendritic cell differentiation cultures. The reagent name is correctly spelled out, the abbreviation is appropriate, and the step is consistent with the context of initiating a bone marrow cell culture followed by a media replacement on day 3. No errors are detected.",
+    "is_detection_correct": true,
+    "is_correction_correct": true,
+    "parameter_match": true,
+    "num_api_calls": 1,
+    "latency_s": 3.485701560974121,
+    "tool_outputs": [
+      "No obvious parameter issues detected.",
+      "Protocol structure appears consistent with context."
+    ]
+  },
+  {
+    "sample_id": "TEST-ERR-000009",
+    "condition": "feedback_loop_1round",
+    "error_type": "correct",
+    "ground_truth_corrupted": "Add 20 ng/mL granulocyte-macrophage colony-stimulating factor (GM-CSF) to the cell suspension.",
+    "ground_truth_corrected": "Add 20 ng/mL granulocyte-macrophage colony-stimulating factor (GM-CSF) to the cell suspension.",
+    "llm_corrected_text": "Add 20 ng/mL granulocyte-macrophage colony-stimulating factor (GM-CSF) to the cell suspension.",
+    "llm_reasoning": "The protocol step appears correct. 20 ng/mL is a standard and widely used concentration of GM-CSF for bone marrow-derived dendritic cell (BMDC) or macrophage differentiation cultures. The reagent name is accurate, and the step is consistent with the context of initiating bone marrow cell culture followed by a day 3 media replacement with fresh GM-CSF. No errors detected.",
+    "is_detection_correct": true,
+    "is_correction_correct": true,
+    "parameter_match": true,
+    "num_api_calls": 1,
+    "latency_s": 3.1602489948272705,
+    "tool_outputs": [
+      "No obvious parameter issues detected.",
+      "Protocol structure appears consistent with context."
+    ]
+  },
+  {
+    "sample_id": "TEST-ERR-000009",
+    "condition": "feedback_loop_3round",
+    "error_type": "correct",
+    "ground_truth_corrupted": "Add 20 ng/mL granulocyte-macrophage colony-stimulating factor (GM-CSF) to the cell suspension.",
+    "ground_truth_corrected": "Add 20 ng/mL granulocyte-macrophage colony-stimulating factor (GM-CSF) to the cell suspension.",
+    "llm_corrected_text": "Add 20 ng/mL granulocyte-macrophage colony-stimulating factor (GM-CSF) to the cell suspension.",
+    "llm_reasoning": "The protocol step appears correct. 20 ng/mL is a standard and widely used concentration for GM-CSF in bone marrow-derived dendritic cell or macrophage differentiation cultures. The reagent name is correctly spelled out, the abbreviation is appropriate, and the step is consistent with the context of initiating a bone marrow cell culture followed by media replacement on day 3. No errors detected.",
+    "is_detection_correct": true,
+    "is_correction_correct": true,
+    "parameter_match": true,
+    "num_api_calls": 1,
+    "latency_s": 3.217620372772217,
+    "tool_outputs": [
+      "No obvious parameter issues detected.",
+      "Protocol structure appears consistent with context."
+    ]
+  }
+]

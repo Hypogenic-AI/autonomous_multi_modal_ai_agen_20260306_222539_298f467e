@@ -1,0 +1,10 @@
+PDF: papers/2503.08979_agentic_ai_survey.pdf
+Total pages: 14
+Pages per chunk: 3
+
+Chunks:
+  2503.08979_agentic_ai_survey_chunk_001.pdf: pages 1-3
+  2503.08979_agentic_ai_survey_chunk_002.pdf: pages 4-6
+  2503.08979_agentic_ai_survey_chunk_003.pdf: pages 7-9
+  2503.08979_agentic_ai_survey_chunk_004.pdf: pages 10-12
+  2503.08979_agentic_ai_survey_chunk_005.pdf: pages 13-14

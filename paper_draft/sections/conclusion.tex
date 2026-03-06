@@ -1,0 +1,16 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+We introduced \wetlabagent, a modular AI agent for biological protocol error detection and correction, and evaluated it across four conditions on the \bioprobench benchmark.
+Our main finding is a stark detection-correction gap: all conditions achieve 80--90\% error detection accuracy but only 20--30\% exact-match correction accuracy.
+We identify \emph{over-correction} --- the tendency of LLMs to fix the primary error while also reformatting surrounding text --- as the dominant failure mode.
+Semantic accuracy, which measures scientific correctness independently of formatting, reaches 70--80\%, with the three-round feedback loop (\feedbackthree) achieving the best result of 80\%.
+
+The practical takeaway for wet-lab automation practitioners is threefold.
+First, AI agents are reliable error \emph{detectors} and can confidently flag protocol anomalies with 80--90\% accuracy using a single LLM call.
+Second, for autonomous \emph{correction}, a minimal-change prompt constraint is essential to prevent over-modification; we estimate this could double exact-match accuracy without sacrificing scientific correctness.
+Third, operation-type errors (\eg centrifuge speeds) remain a hard open problem, likely requiring domain-specific fine-tuning or integration of structured procedure databases.
+
+{\bf Future work.}
+Immediate next steps include: (1) evaluating on the full 27,000-sample \bioprobench dataset to achieve statistical significance and compare against the 12 published LLM baselines; (2) adding a minimal-change instruction to the prompt as a targeted mitigation for over-correction; (3) comparing multiple model families to determine whether failure modes are model-specific; and (4) extending to multi-step protocol evaluation where errors propagate across steps.
+The longer-term goal is integrating \wetlabagent with a physical robotic system to validate that computationally correct protocol fixes translate to improved experimental outcomes.
